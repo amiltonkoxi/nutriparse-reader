@@ -1,36 +1,164 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Food PDF Extractor
+
+**Automatic extraction of allergens and nutritional facts from unstructured food product PDFs (text or scanned).**  
+Frontend: **Next.js (React)** • Backend: **FastAPI (Python)** • OCR: **Tesseract + PyPDFium2**
+
+> *Developer Test Project – University of Debrecen (2025)*  
+> **Instructor:** Dr. Tamás Bérczes • **Student:** Amilton Koxi
+
+---
+
+## 🔍 Overview
+
+This web application extracts and structures data from **food product PDFs** (either digital or scanned), producing clean **JSON outputs** and interactive **tables** showing:
+
+- **Allergens:** Gluten, Egg, Crustaceans, Fish, Peanut, Soy, Milk, Tree Nuts, Celery, Mustard  
+- **Nutrition:** Energy, Fat, Carbohydrate, Sugar, Protein, Sodium
+
+The backend automatically chooses between **text extraction** (PyPDFium2) and **OCR** (Tesseract), ensuring compatibility with any document type.
+
+---
+
+## ⚙️ Architecture
+
+```text
+Frontend (Next.js)
+ └── Uploads PDF → calls FastAPI
+Backend (FastAPI)
+ ├── Text extraction (PyPDFium2)
+ ├── OCR fallback (Tesseract)
+ ├── Rule-based parsing (keywords / regex)
+ └── Returns structured JSON
+````
+
+**Main Technologies**
+
+* **Frontend:** Next.js (TypeScript, App Router)
+* **Backend:** FastAPI (Python 3.12, Uvicorn)
+* **OCR:** Tesseract via `pytesseract`
+* **PDF Reader:** PyPDFium2
+* **Parsing Rules:** `rules/allergens.json` and `rules/nutrition.json`
+
+---
+
+## 📁 Repository Structure
+
+```text
+food-pdf-extractor/
+├─ backend/
+│  ├─ main.py              # FastAPI app & endpoints
+│  ├─ extractors/          # text_extractor.py, ocr_extractor.py
+│  ├─ parsers/             # allergen_parser.py
+│  ├─ rules/               # allergen and nutrition patterns
+│  └─ requirements.txt
+├─ frontend/
+│  ├─ app/page.tsx         # Upload interface + results view
+│  └─ next.config.ts
+└─ samples/
+   └─ test.pdf
+```
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Requirements
+
+* **Python 3.12+**
+* **Node.js 18+**
+* **Tesseract OCR**
+  Ubuntu: `sudo apt install tesseract-ocr tesseract-ocr-eng`
+
+### Backend (FastAPI)
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+uvicorn main:app --reload --host 127.0.0.1 --port 8000
+# Health check → http://127.0.0.1:8000/health  -> {"status":"ok"}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Run test extraction:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+curl -s -X POST "http://127.0.0.1:8000/api/extract" \
+  -F "file=@./samples/test.pdf" | jq
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Frontend (Next.js)
 
-## Learn More
+```bash
+cd frontend
+npm install
+echo "NEXT_PUBLIC_API_BASE=http://127.0.0.1:8000" > .env.local
+npm run dev
+# Open http://localhost:3000
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🧾 Example Output
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### JSON Output (Backend Response)
 
-## Deploy on Vercel
+```json
+{
+  "meta": {
+    "source_file": "test.pdf",
+    "extraction_mode": "text",
+    "confidence": 0.75
+  },
+  "allergens": {
+    "gluten": { "status": "absent", "evidence": "allergen anyagokat nem tartalmaz" },
+    "milk":   { "status": "absent", "evidence": "allergen anyagokat nem tartalmaz" },
+    "soy":    { "status": "unknown", "evidence": null }
+  },
+  "nutrition": {
+    "energy_kJ": null,
+    "fat_g": null,
+    "protein_g": null
+  }
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 📊 Structured Table (Frontend Visualization)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Category      | Item        | Status  | Evidence                         |
+| ------------- | ----------- | ------- | -------------------------------- |
+| **Allergen**  | Gluten      | Absent  | allergen anyagokat nem tartalmaz |
+| **Allergen**  | Milk        | Absent  | allergen anyagokat nem tartalmaz |
+| **Allergen**  | Soy         | Unknown | —                                |
+| **Nutrition** | Energy (kJ) | —       | values per 100g if available     |
+| **Nutrition** | Fat (g)     | —       | values per 100g if available     |
+| **Nutrition** | Protein (g) | —       | values per 100g if available     |
+
+---
+
+## 🧩 Interpretation
+
+* **Backend (FastAPI):** Outputs machine-readable JSON.
+* **Frontend (Next.js):** Renders the same data in a user-friendly table.
+* Data remains synchronized and consistent between layers.
+* Supports multilingual detection and scalable AI-based classification.
+
+---
+
+## 🔜 Roadmap
+
+* Add **AI-based allergen detection (LLMs)**
+* Improve OCR accuracy with **image preprocessing**
+* Extend nutrition field coverage (fiber, salt, cholesterol, etc.)
+* Deploy on **Render (backend)** and **Vercel (frontend)**
+* Add **export formats** (JSON / CSV / PDF report)
+
+---
+
+## 📚 Credits
+
+© 2025 – **Amilton Koxi**
+*MSc Computer Science | University of Debrecen – Developer Test Projects 2025*
+**Instructor:** Dr. Tamás Bérczes
+
