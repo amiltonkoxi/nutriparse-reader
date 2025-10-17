@@ -1,0 +1,12 @@
+{
+  "gluten":       { "contains": ["\\bgluten\\b","\\bwheat\\b","\\bbuza\\b"], "traces": ["may contain gluten","nyomokban gluten"], "absent": ["gluten\\s*-?\\s*free","nem tartalmaz gluten","allergen anyagokat nem tartalmaz"] },
+  "egg":          { "contains": ["\\begg\\b","\\btojas\\b"],               "traces": ["may contain egg","nyomokban tojas"],      "absent": ["egg\\s*-?\\s*free","nem tartalmaz tojast","allergen anyagokat nem tartalmaz"] },
+  "crustaceans":  { "contains": ["crustacean","rak"],                      "traces": ["may contain crustaceans?"],              "absent": ["no crustaceans","nem tartalmaz rak","allergen anyagokat nem tartalmaz"] },
+  "fish":         { "contains": ["\\bfish\\b","\\bhal\\b"],                "traces": ["may contain fish"],                      "absent": ["no fish","nem tartalmaz hal","allergen anyagokat nem tartalmaz"] },
+  "peanut":       { "contains": ["\\bpeanut\\b","foldimogyoro"],           "traces": ["may contain peanuts?"],                  "absent": ["peanut\\s*-?\\s*free","nem tartalmaz foldimogyorot","allergen anyagokat nem tartalmaz"] },
+  "soy":          { "contains": ["\\bsoy\\b","szoja"],                     "traces": ["may contain soy"],                       "absent": ["soy\\s*-?\\s*free","nem tartalmaz szojat","allergen anyagokat nem tartalmaz"] },
+  "milk":         { "contains": ["\\bmilk\\b","\\btej\\b","lactose","laktoz"], "traces": ["may contain milk"],                 "absent": ["milk\\s*-?\\s*free","lactose\\s*-?\\s*free","nem tartalmaz tejet","allergen anyagokat nem tartalmaz"] },
+  "tree_nuts":    { "contains": ["hazelnut","walnut","almond","cashew","pistachio","pecan","brazil\\s+nut","\\bdio\\b"], "traces": ["may contain nuts?"], "absent": ["nut\\s*-?\\s*free","nem tartalmaz diofeleket","allergen anyagokat nem tartalmaz"] },
+  "celery":       { "contains": ["\\bcelery\\b","\\bzeller\\b"],           "traces": ["may contain celery"],                    "absent": ["no celery","nem tartalmaz zellert","allergen anyagokat nem tartalmaz"] },
+  "mustard":      { "contains": ["\\bmustard\\b","\\bmustar\\b"],          "traces": ["may contain mustard"],                   "absent": ["no mustard","nem tartalmaz mustart","allergen anyagokat nem tartalmaz"] }
+}
