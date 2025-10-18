@@ -8,7 +8,7 @@ from extractors.ocr_extractor import extract_text_via_ocr
 from parsers.allergen_parser import parse_allergens
 
 # --- App setup ---
-app = FastAPI(title="Food PDF Extractor API", version="0.2.1")
+app = FastAPI(title="NutriParse Reader API", version="0.2.1")
 
 app.add_middleware(
     CORSMiddleware,

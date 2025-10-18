@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: food-pdf-extractor-api
+    name: nutriparse-reader-api
     env: python
     region: frankfurt
     plan: free

@@ -1,4 +1,4 @@
-#!/home/kingterabyte/food-pdf-extractor/backend/.venv/bin/python3
+#!/home/kingterabyte/nutriparse-reader/backend/.venv/bin/python3
 """Extract pdf structure in XML format"""
 
 import logging

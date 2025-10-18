@@ -10,7 +10,7 @@ export default function Page() {
     <main className="mx-auto max-w-4xl p-6 space-y-6">
       <header className="flex items-center gap-3">
         <img src="/logo.svg" alt="logo" className="h-6"/>
-        <h1 className="text-2xl font-semibold">Food PDF Extractor</h1>
+        <h1 className="text-2xl font-semibold">NutriParse Reader</h1>
       </header>
       <FileUploader onResult={setResult} />
       {result && <ResultCard data={result} />}

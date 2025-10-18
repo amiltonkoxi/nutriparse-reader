@@ -8,7 +8,7 @@ FRONTEND_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/frontend"
 # encerra tudo quando apertar Ctrl+C
 trap "kill 0" INT TERM EXIT
 
-echo "🚀 Starting Food PDF Extractor (backend + frontend)..."
+echo "🚀 Starting NutriParse Reader (backend + frontend)..."
 
 # backend
 echo "▶ Backend: uvicorn running at http://127.0.0.1:8000"

@@ -1,4 +1,4 @@
-# Food PDF Extractor
+# NutriParse Reader
 
 **Automatic extraction of allergens and nutritional facts from unstructured food product PDFs (text or scanned).**  
 Frontend: **Next.js (React)** • Backend: **FastAPI (Python)** • OCR: **Tesseract + PyPDFium2**
@@ -44,7 +44,7 @@ Backend (FastAPI)
 ## 📁 Repository Structure
 
 ```text
-food-pdf-extractor/
+nutriparse-reader/
 ├─ backend/
 │  ├─ main.py              # FastAPI app & endpoints
 │  ├─ extractors/          # text_extractor.py, ocr_extractor.py

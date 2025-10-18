@@ -1,4 +1,4 @@
-# === Food PDF Extractor — Developer shortcuts ===
+# === NutriParse Reader — Developer shortcuts ===
 API ?= http://127.0.0.1:8000
 IN  ?= samples
 OUT ?= out
