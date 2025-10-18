@@ -1,0 +1,6 @@
+# Ignore everything by default...
+*
+
+# ...but allow these back in:
+!.dockerignore
+!backend/**
