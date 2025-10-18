@@ -24,7 +24,7 @@ def health():
     return {"status": "ok"}
 
 # --- Main endpoint ---
-@app.post("/api/extract")
+@app.post("/extract")
 async def extract(file: UploadFile = File(...)):
     # Save temporary file
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
