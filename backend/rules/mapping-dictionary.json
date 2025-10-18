@@ -1,0 +1,29 @@
+{
+  "status_cues": {
+    "contains": ["contains", "tartalmaz", "zawiera"],
+    "traces": ["traces", "may contain", "nyomokban", "może zawierać"],
+    "absent": ["does not contain", "no allergens", "nem tartalmaz", "brak alergenów"]
+  },
+
+  "nutrition": {
+    "energy":        ["energy", "energia", "energiatartalom"],
+    "fat":           ["fat", "zsír"],
+    "carbohydrate":  ["carbohydrate", "szénhidrát"],
+    "sugar":         ["sugar", "cukor"],
+    "protein":       ["protein", "fehérje"],
+    "salt":          ["salt", "só", "nátrium"]
+  },
+
+  "allergens": {
+    "gluten":       ["gluten", "glutén", "búza", "wheat"],
+    "egg":          ["egg", "tojás"],
+    "crustaceans":  ["crustaceans", "rák", "rákfélék"],
+    "fish":         ["fish", "hal"],
+    "peanut":       ["peanut", "földimogyoró"],
+    "soy":          ["soy", "szója"],
+    "milk":         ["milk", "tej", "laktóz", "lactose"],
+    "tree_nuts":    ["tree nuts", "dió", "mandula", "mogyoró", "földimogyoró", "kesudió", "pisztácia", "dióféle", "walnut", "hazelnut", "almond", "cashew", "pistachio", "pecan", "brazil nut"],
+    "celery":       ["celery", "zeller"],
+    "mustard":      ["mustard", "mustár"]
+  }
+}

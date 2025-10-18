@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "product_name": null,
+    "source_file": "Kukta_Gyorsfagyasztott_panírozott_csirkeszárny_termékspecifikáció.pdf",
+    "extraction_mode": "text",
+    "serving_basis": "per 100g",
+    "languages": [
+      "en",
+      "hu",
+      "pl"
+    ],
+    "confidence": 0.75
+  },
+  "allergens": {
+    "gluten": {
+      "status": "contains",
+      "evidence": "\\bgluten\\b"
+    },
+    "egg": {
+      "status": "contains",
+      "evidence": "\\btojas\\b"
+    },
+    "crustaceans": {
+      "status": "contains",
+      "evidence": "crustacean"
+    },
+    "fish": {
+      "status": "contains",
+      "evidence": "\\bfish\\b"
+    },
+    "peanut": {
+      "status": "contains",
+      "evidence": "\\bpeanut\\b"
+    },
+    "soy": {
+      "status": "contains",
+      "evidence": "\\bsoy\\b"
+    },
+    "milk": {
+      "status": "contains",
+      "evidence": "\\bmilk\\b"
+    },
+    "tree_nuts": {
+      "status": "contains",
+      "evidence": "\\bdio\\b"
+    },
+    "celery": {
+      "status": "contains",
+      "evidence": "\\bcelery\\b"
+    },
+    "mustard": {
+      "status": "contains",
+      "evidence": "\\bmustard\\b"
+    }
+  },
+  "nutrition": {
+    "energy": {
+      "kJ": 1173.0,
+      "kcal": null
+    },
+    "fat_g": 18.9,
+    "carbohydrate_g": 8.7,
+    "sugar_g": 82.0,
+    "protein_g": 15.0,
+    "salt_g": 0.45,
+    "sodium_g": null,
+    "notes": "values per 100g if available (auto mg→g)"
+  },
+  "extras": {
+    "saturated_fat_g": null,
+    "water_g": null,
+    "collagen_g": null
+  },
+  "diagnostics": {
+    "warnings": [],
+    "pages_scanned": 0,
+    "raw_text_preview": "PRODUCT SPECIFICATION/TERMÉKSPECIFIKÁCIÓ\nKukta Gyorsfagyasztott panírozott csirkeszárny\n1. Version/1. Verzió: Release Date/Kiadás: Specification nr./ Azonosító:\n28.05.2025 28.05.2025 BUKPCS-1\nProduct Description/ Termék leírás:\nPácolt, panírozott készre sütött csirkeszárny, gyorsfagyasztott.\nProduction method / Gyártási módszer\nA teljes gyártási folyamat a mindenkori EU és Magyar jogszabályoknak megfelelően történik.\nForgalmazza: Mirbesz Kft. H-2051 Biatorbágy Tormásrét utca 1.\nThe slaughterhouse is certified: /Gyártóüzem tanúsítványok:\n- BRCGS\n- IFS (International Food Standard)\n- Halal\nQuality specification / Minőség specifikáció\nGyártó üzem: HU215EK\nIngredient list including QUID declaration/ Összetevőlista:\nCsirkeszárny 82%, búzaliszt, napraforgó olaj, ivóvíz, étkezési só, stabilizálószer (E450, E451), cukor,\nhagyma, fokhagyma, aroma (természetes aroma, ízvilága hús), fűszerkivonat (feketebors, chili), fűszerek\n(vöröshagyma, fokhagyma, chili, feketebors, kakukkfű)\nA termék tartalmazhat tejet, zellert és szóját.\nAlapanyag származása:\nCsirke:\n- Születés helye: Magyarország\n- Nevelés helye: Magyarország, Szlovákia, Románia\nVágás helye:Magyarország\nSuitability data/ Alkalmassági adatok:\nAlkalmassági adatok: IGEN NEM Részletek\nAlkalmas vegetáriánusoknak? NEM\nAlkamas vegánoknak? NEM\nAlkamas lisztérzékenyeknek? NEM\nGM origin labelling required? GM eredet címkézés kötelező? NEM\nAnimal welfare certified? Állatjóléti tanúsítvány? NEM\nOrganoleptic/ Megjelenés\n- Colour: Golden brown exterior / Aranybarna színű\n- Flavour: Specific to chicken, no off flavours /Csirkehúsra jellemző, idegen íztől mentes\n- Texture: Specific to chicken / Csirkehúsra jellemző\n- Odour: Specific to chicken, no off odours / Csirkehúsra jellemző, idegen szagtól mentes\n1 / 3\nPRODUCT SPECIFICATION/TERMÉKSPECIFIKÁCIÓ\nKukta Gyorsfagyasztott panírozott csirkeszárny\n1. Version/1. Verzió: Release Date/Kiadás: Specification nr./ Azonosító:\n28.05.2025 28.05.2025 BUKPCS-1\nMicrobiological standards:\nMicroorganism / Target / Cél Reject Frequency/\nMikroorganizmus Gyakoriság\nTVC / Összmikroba szám ≤1x105 cfu/g 1x106 cfu/g Per batch /\nGyártásonként\nE. coli ≤100 cfu/g 500 cfu/g Per batch /\nGyártásonként\nStaphylococcus aureus ≤100 cfu /g 500 cfu/g Per batch /\nGyártásonként\nSalmonella spp. Nem kimutatható/25g Kimutatható/ 25 g Per batch /\nGyártásonként\nListeria monocytogenes Nem kimutatható/25g Kimutatható / 25 g Per batch /\n(SOL)1 Gyártásonként\nListeria monocytogenes <100 >100 Per batch /\n(EOL)2 Gyártásonként\nEnterobacteriaceae 1x103 cfu/g <1x104 cfu/g Per batch /\nGyártásonként\nPhysical defects,tolerances / Fizikai hibák, tűrések:\nTest / Vizsgálat Target / Cél Maximum/Reject Method/equipment Frequency /\nMaximum/Elutasítás Módszer/berendezés Gyakoriság\nForeign bodies / Idegen hourly/óránként\nNil / Nulla Present / Jelenlét Visual / Vizuális\ntest\nlight brown, lighter/darker colour, hourly/óránként\nColour, shape, size / Szín, uncalibrated size/ size /\nVisual / Vizuális\nalak, méret világos barna, világosabb/sötétebb\nKalibrálatlan szín, méret\ntorn, incorrectly sealed hourly/óránként\nClosing the bag / fully sealed / bags\nVisual / Vizuális\nCsomagolás zárása teljesen lezárt / szakadt, helytelenül\nlezárt zacskók\nFrozen pack weight / Calibrated scales / hourly/óránként\n1000 g e Below T2 / T2 alatt\nFagyasztott csomag súlya Kalibrált mérlegek\n2 / 3\nPRODUCT SPECIFICATION/TERMÉKSPECIFIKÁCIÓ\nKukta Gyorsfagyasztott panírozott csirkeszárny\n1. Version/1. Verzió: Release Date/Kiadás: Specification nr./ Azonosító:\n28.05.2025 28.05.2025 BUKPCS-1\nAllergens information / Allergén információk:\nA termék a következő allergéneket tartalmazza: glutén\nNyomokban tejet, zellert, szóját tartalmazhat.\n01 + milk protein/ tejfehérje 15 - Cocoa/ kakaó\n02 + Lactose/ laktóz 17 - Legumes / pulses/hüvelyesek\n03 - Eggs/ tojás 18 - Nuts/ dió\n04 + soy protein/ szója fehérje 19 - nut oil/ dió olaj\n05 - Soy lecithin/ szója lecitin 20 - Peanuts/ földimogyoró\n06 + Gluten/ glutén 21 - peanut oil/ földimogyoró olaj\n07 + Wheat/ "
+  }
+}

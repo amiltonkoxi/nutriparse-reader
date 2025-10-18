@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "product_name": null,
+    "source_file": "test.pdf",
+    "extraction_mode": "text",
+    "serving_basis": "per 100g",
+    "languages": [
+      "en",
+      "hu",
+      "pl"
+    ],
+    "confidence": 0.75
+  },
+  "allergens": {
+    "gluten": {
+      "status": "absent",
+      "evidence": "allergen anyagokat nem tartalmaz"
+    },
+    "egg": {
+      "status": "absent",
+      "evidence": "allergen anyagokat nem tartalmaz"
+    },
+    "crustaceans": {
+      "status": "absent",
+      "evidence": "allergen anyagokat nem tartalmaz"
+    },
+    "fish": {
+      "status": "absent",
+      "evidence": "allergen anyagokat nem tartalmaz"
+    },
+    "peanut": {
+      "status": "absent",
+      "evidence": "allergen anyagokat nem tartalmaz"
+    },
+    "soy": {
+      "status": "absent",
+      "evidence": "allergen anyagokat nem tartalmaz"
+    },
+    "milk": {
+      "status": "absent",
+      "evidence": "allergen anyagokat nem tartalmaz"
+    },
+    "tree_nuts": {
+      "status": "absent",
+      "evidence": "allergen anyagokat nem tartalmaz"
+    },
+    "celery": {
+      "status": "absent",
+      "evidence": "allergen anyagokat nem tartalmaz"
+    },
+    "mustard": {
+      "status": "absent",
+      "evidence": "allergen anyagokat nem tartalmaz"
+    }
+  },
+  "nutrition": {
+    "energy": {
+      "kJ": null,
+      "kcal": 155.0
+    },
+    "fat_g": 6.9,
+    "carbohydrate_g": 0.0,
+    "sugar_g": 0.0,
+    "protein_g": 21.6,
+    "salt_g": 2.0,
+    "sodium_g": null,
+    "notes": "values per 100g if available"
+  },
+  "extras": {
+    "saturated_fat_g": null,
+    "water_g": null,
+    "collagen_g": null
+  },
+  "diagnostics": {
+    "warnings": [],
+    "pages_scanned": 0,
+    "raw_text_preview": "Kiadva: 2025.09.09. TERMÉKINFORMÁCIÓS LAP Specifikáció nyilvántartási száma:\nÉrvényes: visszavonásig\nGyártja:\nÁrvai Húsműhely Kft.\nHU\n5500 Gyomaendrőd, Fő út 81/1.\nEAN: nem egalizált 835\nForgalmazza:\nEK\nKedvenc Kereskedőház Zrt.\n1117 Budapest, Budafoki út 209/b.\nA TERMÉK NEVE: Friss sertés karaj csn\nTÖMEG: változó\nCSOMAGOLÁS: lédig\nKATEGÓRIA: friss hús\nALKATEGÓRIA: sertéshús\nLOGISZTIKA cca. 15 kg/M10#\nTERMÉK MEGHATÁROZÁSA:\nFriss sertés csontozásából származó vázizomzat csont nélkül\nÖSSZETÉTEL:\n-\nÉRZÉKSZERVI JELLEMZŐK:\nKülalak: Friss húsra jellemző szín, felületén hártya található\nÁllomány, szerkezet,\nPuha, jól összeálló.\nmetszéslap:\nSzín, íz, illat: Friss húsra jellemző szín illat.\nKÜLALAK VIZUÁLIS MEGJELENÍTÉSE:\n2/1 oldal\nKiadva: 2025.09.09. TERMÉKINFORMÁCIÓS LAP Specifikáció nyilvántartási száma:\nÉrvényes: visszavonásig\nGyártja:\nÁrvai Húsműhely Kft.\nHU\n5500 Gyomaendrőd, Fő út 81/1.\nEAN: nem egalizált 835\nForgalmazza:\nEK\nKedvenc Kereskedőház Zrt.\n1117 Budapest, Budafoki út 209/b.\nFIZIKAI ÉS KÉMIAI JELLEMZŐK:\nMutató: Egység: Limit:\nsótartalom m/m %\nvíz tartalom -\nzsírtartalom -\nFehérjetartalom -\nMIKROBIOLÓGIAI KÖVETELMÉNYEK:\n2073/2005/EK és 4/1998.(XI.11) EüM rendelet szerint.\nSZAVATOSSÁGI IDŐ: TÁROLÁSI FELTÉTELEK:\n5 nap (+)4 C fok alatti hömérsékleten\nTERMÉK MEGBONTÁSA UTÁNI SZAV. IDŐ: SZÁLLÍTÁSI KÖRÜLMÉNYEK:\nlédig (+)4 C fok alatti hömérsékleten\nALERGÉN ÉS EGYÉB INFORMÁCIÓK: Átlagos tápértéktartalom 100g termékben\nALLERGÉN ANYAGOKAT NEM TARTALMAZ. Energia 155 kcal\nGMO MENTES. SUGÁRKEZELT ÖSSZETEVŐT NEM TARTALMAZ.\nAZ ÉLELMISZER ÉS ANNAK JELÖLÉSE, VALAMINT CSOMAGOLÓANYAGA\nZsír 6,9\nMEGFELEL A MAGYAR ÉS AZ EU-S JOGSZABÁLYI ELŐÍRÁSOKNAK.\nAZ ÉLELMISZER ELŐÁLLÍTÁSÁÉRT ÉS A DOKUMENTUM TARTALMÁÉRT\nFELELŐS SZEMÉLY: ÁRVAI KÁROLY ÜGYVEZETŐ amelyből telített zsírsav 2,5\nÖsszes szénhidrát 0\namelyből cukor 0\nFehérje 21,6\nSó -\n2/2 oldal"
+  }
+}
