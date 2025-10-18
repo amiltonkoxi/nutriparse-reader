@@ -32,3 +32,11 @@ Thumbs.db
 
 # Coverage
 coverage/
+
+# Ignore env/build artifacts
+backend/.venv/
+frontend/.next/
+node_modules/
+out/
+__pycache__/
+*.pyc
