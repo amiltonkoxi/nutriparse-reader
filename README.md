@@ -1,164 +1,131 @@
-# NutriParse Reader
+<h1 align="center">NutriParse Reader</h1>
 
-**Automatic extraction of allergens and nutritional facts from unstructured food product PDFs (text or scanned).**  
-Frontend: **Next.js (React)** • Backend: **FastAPI (Python)** • OCR: **Tesseract + PyPDFium2**
-
-> *Developer Test Project – University of Debrecen (2025)*  
-> **Instructor:** Dr. Tamás Bérczes • **Student:** Amilton Koxi
-
----
-
-## 🔍 Overview
-
-This web application extracts and structures data from **food product PDFs** (either digital or scanned), producing clean **JSON outputs** and interactive **tables** showing:
-
-- **Allergens:** Gluten, Egg, Crustaceans, Fish, Peanut, Soy, Milk, Tree Nuts, Celery, Mustard  
-- **Nutrition:** Energy, Fat, Carbohydrate, Sugar, Protein, Sodium
-
-The backend automatically chooses between **text extraction** (PyPDFium2) and **OCR** (Tesseract), ensuring compatibility with any document type.
+<p align="center">
+  End-to-end toolkit for extracting allergens and nutrition facts from food product PDFs.<br/>
+  University of Debrecen · Developer Test Project · 2025
+</p>
 
 ---
 
-## ⚙️ Architecture
+## Snapshot
+
+![NutriParse Reader UI](image/Nutriparse.jpg)
+
+NutriParse Reader ingests both native and scanned PDFs, recognises allergen statements, and normalises nutrition panels into a structured dataset. The workflow is tailored to the assignment brief from Dr. Tamás Bérczes and demonstrates how a production-ready submission could look.
+
+---
+
+## Why it matters
+
+- **Two modes, one flow.** Text-first parsing with PyPDFium2, OCR fallback with Tesseract whenever the document is image-based.  
+- **Assignment-aligned outputs.** Focused on the ten required allergens and the six nutrition fields, with confidence scoring and evidence traces.  
+- **Concise operator experience.** Drag-and-drop, queue management, rich result cards, and JSON export in one screen.  
+- **Deployment-ready.** Next.js frontend (app router) paired with a FastAPI service, easy to host separately or together.
+
+---
+
+## Architecture at a glance
 
 ```text
-Frontend (Next.js)
- └── Uploads PDF → calls FastAPI
-Backend (FastAPI)
- ├── Text extraction (PyPDFium2)
- ├── OCR fallback (Tesseract)
- ├── Rule-based parsing (keywords / regex)
- └── Returns structured JSON
-````
+Next.js frontend
+ └─ uploads PDF → POST /extract
 
-**Main Technologies**
-
-* **Frontend:** Next.js (TypeScript, App Router)
-* **Backend:** FastAPI (Python 3.12, Uvicorn)
-* **OCR:** Tesseract via `pytesseract`
-* **PDF Reader:** PyPDFium2
-* **Parsing Rules:** `rules/allergens.json` and `rules/nutrition.json`
-
----
-
-## 📁 Repository Structure
-
-```text
-nutriparse-reader/
-├─ backend/
-│  ├─ main.py              # FastAPI app & endpoints
-│  ├─ extractors/          # text_extractor.py, ocr_extractor.py
-│  ├─ parsers/             # allergen_parser.py
-│  ├─ rules/               # allergen and nutrition patterns
-│  └─ requirements.txt
-├─ frontend/
-│  ├─ app/page.tsx         # Upload interface + results view
-│  └─ next.config.ts
-└─ samples/
-   └─ test.pdf
+FastAPI backend
+ ├─ text_extractor.py (PyPDFium2)
+ ├─ ocr_extractor.py  (Tesseract)
+ ├─ nutrition_parser.py / allergen_parser.py
+ └─ response builder (JSON + metadata)
 ```
 
+The parsers rely on keyword heuristics and lightweight rule sets, delivering deterministic answers without requiring external APIs. If the text extractor fails to recover enough tokens, the OCR path re-runs the pipeline automatically.
+
 ---
 
-## Getting Started
+## Feature tour
 
-### Requirements
+| Area            | Highlights                                                                                   |
+| --------------- | --------------------------------------------------------------------------------------------- |
+| **Upload**      | Drag & drop, direct select, multi-file queue, PDF MIME enforcement, guest vs. logged-in caps  |
+| **Processing**  | Sequential API posting with optimistic UI, status hints, and defensive error messaging       |
+| **Results**     | Allergen pills with evidence tooltip, nutrition tiles per 100 g, mode/confidence indicators  |
+| **Export**      | One-click JSON copy for downstream systems or QA review                                      |
 
-* **Python 3.12+**
-* **Node.js 18+**
-* **Tesseract OCR**
-  Ubuntu: `sudo apt install tesseract-ocr tesseract-ocr-eng`
+---
 
-### Backend (FastAPI)
+## Tech stack
+
+| Layer        | Technology & Notes                                           |
+| ------------ | ------------------------------------------------------------ |
+| Frontend     | Next.js 14, React Server Components, Tailwind CSS, TypeScript |
+| Backend      | FastAPI, Pydantic, uvicorn                                   |
+| OCR          | Tesseract 5 via pytesseract                                  |
+| PDF parsing  | PyPDFium2 for deterministic text extraction                  |
+| Styling      | Tailwind with bespoke components (Dropzone, ResultCard)      |
+
+---
+
+## Getting started locally
+
+### 1. Backend
 
 ```bash
 cd backend
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate           # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-
-uvicorn main:app --reload --host 127.0.0.1 --port 8000
-# Health check → http://127.0.0.1:8000/health  -> {"status":"ok"}
+uvicorn app.main:app --reload
 ```
 
-Run test extraction:
+The API listens on `http://127.0.0.1:8000`. The main endpoint is `POST /extract` accepting a single `file` form field.
 
-```bash
-curl -s -X POST "http://127.0.0.1:8000/api/extract" \
-  -F "file=@./samples/test.pdf" | jq
-```
-
-### Frontend (Next.js)
+### 2. Frontend
 
 ```bash
 cd frontend
 npm install
 echo "NEXT_PUBLIC_API_BASE=http://127.0.0.1:8000" > .env.local
 npm run dev
-# Open http://localhost:3000
+```
+
+Open `http://localhost:3000` and upload one of the sample PDFs found in `/samples`.
+
+---
+
+## Repository layout
+
+```text
+nutriparse-reader/
+├─ backend/
+│  ├─ app/main.py                 # FastAPI entry point
+│  ├─ extractors/                 # Text and OCR extraction helpers
+│  ├─ parsers/                    # Allergen and nutrition post-processing
+│  ├─ rules/                      # Keyword dictionaries and thresholds
+│  └─ requirements.txt
+├─ frontend/
+│  ├─ app/                        # Next.js routes, layout, page shell
+│  ├─ components/                 # Dropzone, ResultCard, HowItWorks, etc.
+│  ├─ lib/                        # API client, shared types
+│  └─ tailwind.config.ts
+└─ samples/                       # Real-world PDFs used for testing
 ```
 
 ---
 
-## 🧾 Example Output
+## Deliverables checklist (per brief)
 
-### JSON Output (Backend Response)
+- ✅ Source code for both frontend and backend  
+- ✅ User-focused walkthrough (this README + in-app hints)  
+- ✅ Demonstration video (recorded after deployment)  
+- ✅ Live environment URL (Vercel + Render pairing)  
 
-```json
-{
-  "meta": {
-    "source_file": "test.pdf",
-    "extraction_mode": "text",
-    "confidence": 0.75
-  },
-  "allergens": {
-    "gluten": { "status": "absent", "evidence": "allergen anyagokat nem tartalmaz" },
-    "milk":   { "status": "absent", "evidence": "allergen anyagokat nem tartalmaz" },
-    "soy":    { "status": "unknown", "evidence": null }
-  },
-  "nutrition": {
-    "energy_kJ": null,
-    "fat_g": null,
-    "protein_g": null
-  }
-}
-```
-
-### 📊 Structured Table (Frontend Visualization)
-
-| Category      | Item        | Status  | Evidence                         |
-| ------------- | ----------- | ------- | -------------------------------- |
-| **Allergen**  | Gluten      | Absent  | allergen anyagokat nem tartalmaz |
-| **Allergen**  | Milk        | Absent  | allergen anyagokat nem tartalmaz |
-| **Allergen**  | Soy         | Unknown | —                                |
-| **Nutrition** | Energy (kJ) | —       | values per 100g if available     |
-| **Nutrition** | Fat (g)     | —       | values per 100g if available     |
-| **Nutrition** | Protein (g) | —       | values per 100g if available     |
+Refer to the Microsoft Teams group “Developer Test Projects – 2025” for submission logistics.
 
 ---
 
-## 🧩 Interpretation
+## Credits
 
-* **Backend (FastAPI):** Outputs machine-readable JSON.
-* **Frontend (Next.js):** Renders the same data in a user-friendly table.
-* Data remains synchronized and consistent between layers.
-* Supports multilingual detection and scalable AI-based classification.
+- **Student:** Amilton Koxi, MSc Computer Science  
+- **Supervisor:** Dr. Tamás Bérczes  
+- **Institution:** University of Debrecen, Hungary  
 
----
-
-## 🔜 Roadmap
-
-* Add **AI-based allergen detection (LLMs)**
-* Improve OCR accuracy with **image preprocessing**
-* Extend nutrition field coverage (fiber, salt, cholesterol, etc.)
-* Deploy on **Render (backend)** and **Vercel (frontend)**
-* Add **export formats** (JSON / CSV / PDF report)
-
----
-
-## 📚 Credits
-
-© 2025 – **Amilton Koxi**
-*MSc Computer Science | University of Debrecen – Developer Test Projects 2025*
-**Instructor:** Dr. Tamás Bérczes
-
+_Parsing food, feeding data – NutriParse Reader · 2025_
