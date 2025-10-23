@@ -9,7 +9,7 @@
 
 ## Snapshot
 
-![NutriParse Reader UI](image/Nutriparse.jpg)
+![NutriParse Reader UI](./image/Nutriparse.jpg)
 
 NutriParse Reader ingests both native and scanned PDFs, recognises allergen statements, and normalises nutrition panels into a structured dataset. The workflow is tailored to the assignment brief from Dr. Tamás Bérczes and demonstrates how a production-ready submission could look.
 
