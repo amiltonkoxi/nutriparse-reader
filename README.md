@@ -68,7 +68,21 @@ NutriParse Reader is a full-stack web application that automatically extracts al
    ```
 
 6. **Open the app**
-   Visit `http://localhost:3000` in your browser, select up to two PDFs, and inspect the extracted data.
+Visit `http://localhost:3000` in your browser, select up to two PDFs, and inspect the extracted data.
+
+---
+
+## Deployment
+
+NutriParse Reader runs with a split deployment: the backend is hosted on Render, and the frontend is served by Vercel.
+
+- **Backend:** https://nutriparse-reader-1.onrender.com  
+- **Frontend:** https://nutriparsereader.vercel.app
+
+Environment variables:
+
+- **Render:** set `ALLOWED_ORIGINS` to `https://nutriparsereader.vercel.app,http://localhost:3000` so CORS covers production and local development.  
+- **Vercel:** set `NEXT_PUBLIC_API_BASE` to the Render backend URL so client requests go to the deployed API.
 
 ---
 
@@ -90,6 +104,53 @@ NutriParse Reader is a full-stack web application that automatically extracts al
 | Documentation          | ✅ This README provides setup, architecture, and usage details. |
 | Demonstration video    | 🔧 *To be added.* Recording will showcase upload and extraction flow. |
 | Live deployment URL    | 🔧 *To be added.* Hosted version will be linked once deployed. |
+
+---
+
+## Testing & Contribution
+
+If pytest is installed inside the backend virtual environment, activate the venv and run:
+
+```bash
+cd backend
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pytest
+```
+
+### Contributing
+
+Fork the repository, create a feature branch, commit your changes, and open a pull request.
+
+---
+
+## Architecture
+
+```
+User → Vercel Frontend (Next.js) → Render Backend (FastAPI)
+                   ↘               ↘
+                     OCR Engine (Tesseract) → Parser & LLM rules
+                                 ↘
+                           JSON response → Frontend display
+```
+
+- The Next.js frontend hosts the upload UI and result cards.
+- FastAPI on Render receives PDFs, orchestrates OCR and parsing, and returns normalized JSON.
+- Tesseract handles scanned/image PDFs; rule-based parsing plus LLM prompts extract allergens and nutrition.
+- Results are rendered in both table and JSON tabs for review/export.
+
+---
+
+## Limitations & Future Work
+
+### Current limitations
+- Optimized for Hungarian and English PDFs; other languages may require new rules.
+- Allergen list is fixed to the 10 items defined in the assignment.
+- OCR-driven accuracy depends on source document quality (blurry scans reduce precision).
+
+### Planned improvements
+- Expand language coverage (Polish/German) with modular keyword packs.
+- Enrich nutrition parsing with serving-size conversion and micronutrients.
+- Provide a Docker Compose stack for streamlined local development and E2E testing.
 
 ---
 
