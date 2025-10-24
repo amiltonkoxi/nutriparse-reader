@@ -1,0 +1,22 @@
+File: 50180 - CIGÁNDI CÉRNAMETÉLT 4TOJ 5KG.pdf
+Confidence: 65%
+
+Allergens:
+ - gluten: contains (→ . (a termek allergen anyagot tartalmaz: buzaliszt, tyuktojas) kereszts...)
+ - egg: unknown
+ - crustaceans: unknown
+ - fish: unknown
+ - peanut: unknown
+ - soy: unknown
+ - milk: unknown
+ - tree_nuts: unknown
+ - celery: unknown
+ - mustard: unknown
+
+Nutrition per 100g:
+  Energy: — kJ / — kcal
+  Fat: — g
+  Carbs: — g
+  Sugar: 72.398 g
+  Protein: 12.7 g
+  Salt: — g

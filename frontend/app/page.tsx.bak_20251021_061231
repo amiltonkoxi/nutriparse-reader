@@ -1,0 +1,261 @@
+"use client";
+
+import { useState, useCallback, DragEvent } from "react";
+import Image from "next/image";
+import ResultCard from "@/components/ResultCard";
+
+type UploadResult = {
+  meta: { source_file: string; extraction_mode: "text" | "ocr"; confidence: number };
+  allergens: Record<
+    string,
+    { status: "contains" | "traces" | "absent" | "unknown"; evidence: string | null }
+  >;
+  nutrition: {
+    energy: { kJ: number | null; kcal: number | null };
+    fat_g: number | null;
+    carbohydrate_g: number | null;
+    sugar_g: number | null;
+    protein_g: number | null;
+    salt_g: number | null;
+    sodium_g: number | null;
+    notes?: string | null;
+  };
+};
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+
+export default function HomePage() {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [results, setResults] = useState<UploadResult[]>([]);
+
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => setIsDragging(false);
+
+  const handleDrop = async (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = Array.from(e.dataTransfer.files || []).filter(
+      (f) => f.type === "application/pdf"
+    );
+    await handleFiles(files);
+  };
+
+  const handleChooseFiles = async (evt: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(evt.target.files || []).filter(
+      (f) => f.type === "application/pdf"
+    );
+    await handleFiles(files);
+    if (inputRef.current) inputRef.current.value = ""; // allow reselect same file
+  };
+
+  const handleFiles = useCallback(async (files: File[]) => {
+    setError(null);
+    if (!files.length) return;
+
+    const capped = files.slice(0, 5);
+    if (files.length > 5) {
+      setError("You can upload up to 5 PDF files. Only the first 5 were taken.");
+    }
+
+    setBusy(true);
+    try {
+      const newResults: UploadResult[] = [];
+      for (const file of capped) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await fetch(`${API_BASE}/extract`, { method: "POST", body: formData });
+        if (!res.ok) {
+          const txt = await res.text().catch(() => "");
+          throw new Error(`Upload failed for ${file.name}. ${txt}`);
+        }
+        const data = (await res.json()) as UploadResult;
+        newResults.push(data);
+      }
+      setResults((prev) => [...newResults, ...prev]);
+    } catch (err: any) {
+      setError(err?.message || "Upload failed. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-white text-slate-800">
+      {/* NAVBAR */}
+      <header className="border-b bg-white/70 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+          <div className="flex items-center gap-3">
+            <Image src="/favicon.png" width={28} height={28} alt="NP" className="rounded" />
+            <span className="font-semibold">NutriParse Reader</span>
+            <span className="ml-2 rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">
+              v0.2 • Demo
+            </span>
+          </div>
+          <a
+            href="https://github.com/amiltonkoxi/nutriparse-reader"
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-md border px-3 py-1.5 text-sm hover:bg-slate-50"
+          >
+            GitHub
+          </a>
+        </div>
+      </header>
+
+      {/* HERO SECTION */}
+      <section className="mx-auto max-w-6xl px-4">
+        <div className="mx-auto mt-16 mb-8 text-center">
+          <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+            Extract Allergens & Nutrition from PDFs
+          </h1>
+          <p className="mx-auto mt-3 max-w-2xl text-slate-600">
+            Upload up to{" "}
+            <span className="font-semibold text-emerald-700">5 PDF files</span>. NutriParse
+            Reader automatically detects allergens and nutritional data using OCR and text
+            extraction, returning clean structured results.
+          </p>
+        </div>
+
+        {/* FILE UPLOADER */}
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={`mx-auto mb-10 mt-8 flex max-w-5xl cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed p-10 transition
+            ${
+              isDragging
+                ? "border-emerald-500 bg-emerald-50/60"
+                : "border-slate-300 bg-white"
+            }`}
+        >
+          <div className="w-full max-w-3xl text-center">
+            <p className="mb-4 text-lg">
+              Drop your PDF files here or click below (max 5).
+            </p>
+            <div className="flex items-center justify-center gap-3">
+              <label
+                htmlFor="file-input"
+                className="inline-flex items-center justify-center rounded-md bg-emerald-600 px-5 py-2.5 text-white shadow hover:bg-emerald-700 disabled:opacity-60"
+              >
+                {busy ? "Processing…" : "Select Files"}
+              </label>
+              <input
+                id="file-input"
+      ref={inputRef}
+                type="file"
+                multiple
+                accept="application/pdf"
+                className="hidden"
+                onChange={handleChooseFiles}
+                disabled={busy}
+              />
+              <span className="text-sm text-slate-500">
+                PDF format only • Up to 5 files
+              </span>
+            </div>
+            {error && <p className="mt-3 text-sm text-rose-600">{error}</p>}
+          </div>
+        </div>
+
+        {/* RESULTS */}
+        {results.length > 0 && (
+          <div className="mx-auto mb-20 max-w-5xl space-y-6">
+            {results.map((r, idx) => (
+              <ResultCard key={idx} data={r as any} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="border-t bg-emerald-50/40 py-16">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 sm:grid-cols-3">
+          <Step
+            num="1"
+            title="Upload"
+            text="Drag & drop or select up to 5 PDF product sheets."
+          />
+          <Step
+            num="2"
+            title="Extract"
+            text="NutriParse detects allergens and nutritional values using OCR and AI parsing."
+          />
+          <Step
+            num="3"
+            title="Review"
+            text="View all data in a clear structured layout and download the JSON results."
+          />
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section className="py-16">
+        <div className="mx-auto max-w-6xl px-4">
+          <h2 className="mb-6 text-center text-2xl font-semibold">
+            Why Choose NutriParse Reader?
+          </h2>
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              "OCR fallback for scanned PDFs",
+              "FastAPI backend + Next.js frontend",
+              "Clear and structured JSON output",
+              "Privacy-friendly — no file storage",
+              "Modern UI with drag & drop",
+              "Easy deployment on Render & Vercel",
+            ].map((f, i) => (
+              <li
+                key={i}
+                className="flex items-start gap-3 rounded-lg border p-4"
+              >
+                <span className="mt-1 h-2 w-2 rounded-full bg-emerald-600" />
+                <span>{f}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t py-10">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 text-sm text-slate-500">
+          <p>© 2025 NutriParse Reader</p>
+          <a
+            href="https://github.com/amiltonkoxi/nutriparse-reader"
+            className="hover:underline"
+          >
+            GitHub
+          </a>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+/** Step Card (used in “How It Works”) */
+function Step({
+  num,
+  title,
+  text,
+}: {
+  num: string;
+  title: string;
+  text: string;
+}) {
+  return (
+    <div className="rounded-xl border bg-white p-6 text-center shadow-sm transition hover:shadow-md">
+      <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600 text-white">
+        {num}
+      </div>
+      <h3 className="mb-1 font-semibold">{title}</h3>
+      <p className="text-sm text-slate-600">{text}</p>
+    </div>
+  );
+}

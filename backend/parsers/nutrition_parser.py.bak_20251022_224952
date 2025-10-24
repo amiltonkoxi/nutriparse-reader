@@ -1,0 +1,143 @@
+from __future__ import annotations
+import re
+from typing import Dict, Optional
+
+# -------- helpers ----------
+def _norm(text: str) -> str:
+    if not text:
+        return ""
+    text = text.replace("\r", "\n")
+    # vírgula decimal -> ponto
+    text = re.sub(r"(\d),(\d)", r"\1.\2", text)
+    # espaços e quebras
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n{2,}", "\n", text)
+    return text
+
+def _to_float(num: str) -> Optional[float]:
+    try:
+        return float(num)
+    except Exception:
+        return None
+
+_per100_re = re.compile(r"(?:per|/)\s*100\s*g|100\s*g\b|100g\b", re.I)
+
+def _looks_like_per100_context(hay: str) -> bool:
+    # Sinaliza se nesse pedaço aparece "per 100 g", "100 g", "100g", etc.
+    return bool(_per100_re.search(hay))
+
+def _capture_value(patterns, text) -> Optional[float]:
+    """
+    Captura valores em g/mg com heurística para NÃO aceitar o "100" do "per 100 g".
+    """
+    for pat in patterns:
+        for m in re.finditer(pat, text, flags=re.I):
+            val = m.group("val")
+            unit = (m.groupdict().get("unit") or "").strip().lower()
+            v = _to_float(val)
+            if v is None:
+                continue
+
+            # Janela de contexto em torno do match para checar "per 100 g"
+            start = max(m.start() - 80, 0)
+            end   = min(m.end() + 80, len(text))
+            ctx   = text[start:end]
+
+            # Heurística: se v ~ 100 e o contexto tem "per 100 g", ignorar
+            if 95.0 <= v <= 105.0 and _looks_like_per100_context(ctx):
+                continue
+
+            # mg -> g
+            if unit in ("mg",):
+                return round(v / 1000.0, 3)
+            return round(v, 3)
+    return None
+
+def _capture_energy_kj(text) -> Optional[float]:
+    pats = [
+        r"(?P<val>\d{1,4}(?:\.\d+)?)\s*(?P<unit>kj)\b",
+        r"energia\s*[:\-]?\s*(?P<val>\d{1,4}(?:\.\d+)?)\s*(?P<unit>kj)",
+        r"energy\s*[:\-]?\s*(?P<val>\d{1,4}(?:\.\d+)?)\s*(?P<unit>kj)",
+        r"energia[^a-z0-9]+(?P<val>\d{1,4}(?:\.\d+)?)\s*(?P<unit>kj)",
+    ]
+    for pat in pats:
+        m = re.search(pat, text, flags=re.I)
+        if m:
+            return _to_float(m.group("val"))
+    return None
+
+def _capture_energy_kcal(text) -> Optional[float]:
+    pats = [
+        r"(?P<val>\d{1,4}(?:\.\d+)?)\s*(?P<unit>kcal)\b",
+        r"energia\s*\(kcal\)\s*[:\-]?\s*(?P<val>\d{1,4}(?:\.\d+)?)",
+        r"energy\s*\(kcal\)\s*[:\-]?\s*(?P<val>\d{1,4}(?:\.\d+)?)",
+    ]
+    for pat in pats:
+        m = re.search(pat, text, flags=re.I)
+        if m:
+            return _to_float(m.group("val"))
+    return None
+
+LABELS = {
+    "fat":      [r"\bfat\b", r"\bzs[ií]r\b", r"\bt[lł]uszcz\b"],
+    "carb":     [r"\bcarb(?:ohydrate)?s?\b", r"\bsz[eé]nhidr[aá]t\b", r"\bw[eę]glowodan(?:y)?\b"],
+    "sugar":    [r"\bsugar(?:s)?\b", r"\bcukor\b", r"\bcukry\b"],
+    "protein":  [r"\bprotein\b", r"\bfeh[eé]rje\b", r"\bbia[lł]ko\b"],
+    "salt":     [r"\bsalt\b", r"\bs[oó]\b", r"\bs[oó]l\b"],
+    "sodium":   [r"\bsodium\b", r"\bn[aá]trium\b", r"\bs[oó]d\b"],
+}
+
+def _mk_patterns(words):
+    pats = []
+    for w in words:
+        # até 25 chars não numéricos entre o rótulo e o valor
+        pats.append(rf"{w}[^0-9%]{{0,25}}(?P<val>\d{{1,4}}(?:\.\d+)?)[ ]*(?P<unit>mg|g)?\b")
+    return pats
+
+PAT_FAT      = _mk_patterns(LABELS["fat"])
+PAT_CARB     = _mk_patterns(LABELS["carb"])
+PAT_SUGAR    = _mk_patterns(LABELS["sugar"])
+PAT_PROTEIN  = _mk_patterns(LABELS["protein"])
+PAT_SALT     = _mk_patterns(LABELS["salt"])
+PAT_SODIUM   = _mk_patterns(LABELS["sodium"])
+
+def parse_nutrition(text: str) -> Dict:
+    t = _norm(text)
+    t_low = t.lower()
+
+    # limitar escopo ao(s) bloco(s) com "per 100 g" se existirem
+    cand = []
+    for blk in t.split("\n"):
+        if _looks_like_per100_context(blk):
+            cand.append(blk)
+    scope = "\n".join(cand) if cand else t
+
+    kj   = _capture_energy_kj(scope)
+    kcal = _capture_energy_kcal(scope)
+
+    # kJ <-> kcal fallback
+    if kj is not None and kcal is None:
+        kcal = round(kj / 4.184, 0)
+    if kcal is not None and kj is None:
+        kj = round(kcal * 4.184, 0)
+
+    fat      = _capture_value(PAT_FAT, scope)
+    carb     = _capture_value(PAT_CARB, scope)
+    sugar    = _capture_value(PAT_SUGAR, scope)
+    protein  = _capture_value(PAT_PROTEIN, scope)
+    salt     = _capture_value(PAT_SALT, scope)
+    sodium   = _capture_value(PAT_SODIUM, scope)
+
+    if salt is None and sodium is not None:
+        salt = round(sodium * 2.54, 3)
+
+    return {
+        "energy": {"kJ": kj, "kcal": kcal},
+        "fat_g": fat,
+        "carbohydrate_g": carb,
+        "sugar_g": sugar,
+        "protein_g": protein,
+        "salt_g": salt,
+        "sodium_g": sodium,
+        "notes": "values per 100g if available (guards around 'per 100 g'; auto mg→g; salt from sodium×2.54; kJ↔kcal fallback)",
+    }

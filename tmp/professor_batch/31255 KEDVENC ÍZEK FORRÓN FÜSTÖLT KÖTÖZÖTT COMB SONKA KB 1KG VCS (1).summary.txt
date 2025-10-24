@@ -1,0 +1,22 @@
+File: 31255 KEDVENC ÍZEK FORRÓN FÜSTÖLT KÖTÖZÖTT COMB SONKA KB 1KG VCS (1).pdf
+Confidence: 75%
+
+Allergens:
+ - gluten: contains (→ rgenkent nem tartalmazza az alabbiakat: gluten szoja laktoz mustar zel...)
+ - egg: unknown
+ - crustaceans: unknown
+ - fish: unknown
+ - peanut: unknown
+ - soy: contains (→ t nem tartalmazza az alabbiakat: gluten szoja laktoz mustar zeller dio...)
+ - milk: contains (→ tartalmazza az alabbiakat: gluten szoja laktoz mustar zeller diofelek ...)
+ - tree_nuts: unknown
+ - celery: contains (→ alabbiakat: gluten szoja laktoz mustar zeller diofelek mikrobiologiai ...)
+ - mustard: contains (→ azza az alabbiakat: gluten szoja laktoz mustar zeller diofelek mikrobi...)
+
+Nutrition per 100g:
+  Energy: — kJ / — kcal
+  Fat: — g
+  Carbs: — g
+  Sugar: — g
+  Protein: — g
+  Salt: — g

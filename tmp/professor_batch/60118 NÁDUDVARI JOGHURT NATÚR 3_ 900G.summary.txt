@@ -1,0 +1,22 @@
+File: 60118 NÁDUDVARI JOGHURT NATÚR 3_ 900G.pdf
+Confidence: 65%
+
+Allergens:
+ - gluten: unknown
+ - egg: contains (→ kek mentes tartalmaz l] elofordulhat l] tojas es abbol keszult termeke...)
+ - crustaceans: unknown
+ - fish: contains (→ kek mentes tartalmaz l! elofordulhat li hal es abbol keszult termekek ...)
+ - peanut: contains (→ kek mentes tartalmaz l] elofordulhat li foldimogyoro es abbol keszult ...)
+ - soy: unknown
+ - milk: contains (→ ekek mentes tartalmaz l] elofordulhat o tej es abbol keszult termekek ...)
+ - tree_nuts: unknown
+ - celery: contains (→ kek mentes tartalmaz l! elofordulhat li zeller es abbol keszult termek...)
+ - mustard: contains (→ kek mentes tartalmaz l] elofordulhat l] mustar es abbol keszult termek...)
+
+Nutrition per 100g:
+  Energy: 223.0 kJ / 53.0 kcal
+  Fat: — g
+  Carbs: 2.8 g
+  Sugar: — g
+  Protein: 3.2 g
+  Salt: 0.1 g

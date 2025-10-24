@@ -1,0 +1,65 @@
+from __future__ import annotations
+from fastapi import FastAPI, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
+import tempfile, os
+
+from extractors.text_extractor import extract_text
+from extractors.ocr_extractor import ocr_extract
+from parsers.allergen_parser import parse_allergens
+from parsers.nutrition_parser import parse_nutrition
+
+app = FastAPI(title="NutriParse Reader API", version="0.3.0")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
+)
+
+@app.get("/health")
+def health(): return {"status": "ok"}
+
+@app.post("/extract")
+async def extract(file: UploadFile = File(...)):
+    # salvar temporário
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        pdf_path = tmp.name
+        tmp.write(await file.read())
+    try:
+        text = extract_text(pdf_path)
+        mode = "text"
+        if not text or len(text) < 200:
+            text = ocr_extract(pdf_path)
+            if text:
+                mode = "ocr"
+
+        t = text or ""
+        allergens  = parse_allergens(t)
+        nutrition  = parse_nutrition(t)
+
+        # idiomas detectados (heurística leve)
+        langs = []
+        if any(w in t for w in ["energy", "fat", "sugar", "milk", "soy"]): langs.append("en")
+        if any(w in t for w in ["energia", "zsir", "cukor", "tej", "szoja", "gluten"]): langs.append("hu")
+        if any(w in t for w in ["energia", "tłuszcz", "cukry", "biało", "sól", "soja"]): langs.append("pl")
+        langs = list(dict.fromkeys(langs)) or ["en"]
+
+        return {
+            "meta": {
+                "product_name": None,
+                "source_file": file.filename,
+                "extraction_mode": mode,
+                "serving_basis": "per 100g",
+                "languages": langs,
+                "confidence": 0.75 if mode == "text" else 0.65
+            },
+            "allergens": allergens,
+            "nutrition": nutrition,
+            "extras": {"saturated_fat_g": None, "water_g": None, "collagen_g": None},
+            "diagnostics": {
+                "warnings": [],
+                "pages_scanned": (t.count("\n") // 40) if t else 0,
+                "raw_text_preview": (t[:2000] if t else "")
+            }
+        }
+    finally:
+        try: os.remove(pdf_path)
+        except Exception: pass

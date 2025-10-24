@@ -1,0 +1,110 @@
+from __future__ import annotations
+import re
+from typing import Dict, Optional
+
+def _norm(text: str) -> str:
+    if not text:
+        return ""
+    text = text.replace("\r", "\n")
+    text = re.sub(r"(\d),(\d)", r"\1.\2", text)   # vírgula decimal
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n{2,}", "\n", text)
+    return text.lower().strip()
+
+def _to_float(num: str) -> Optional[float]:
+    try:
+        return float(num)
+    except Exception:
+        return None
+
+def _capture_value(patterns, text) -> Optional[float]:
+    for pat in patterns:
+        for m in re.finditer(pat, text, flags=re.I):
+            val = m.group("val")
+            unit = (m.groupdict().get("unit") or "").strip().lower()
+            v = _to_float(val)
+            if v is None:
+                continue
+            if unit in ("mg",):
+                return round(v / 1000.0, 3)
+            return round(v, 3)
+    return None
+
+def _capture_energy_kj(text) -> Optional[float]:
+    pats = [
+        r"(?P<val>\d{1,4}(?:\.\d+)?)\s*(?P<unit>kj)\b",
+        r"energia\s*[:\-]?\s*(?P<val>\d{1,4}(?:\.\d+)?)\s*(?P<unit>kj)",
+        r"energy\s*[:\-]?\s*(?P<val>\d{1,4}(?:\.\d+)?)\s*(?P<unit>kj)",
+        r"energia[^a-z0-9]+(?P<val>\d{1,4}(?:\.\d+)?)\s*(?P<unit>kj)",
+    ]
+    for pat in pats:
+        m = re.search(pat, text, flags=re.I)
+        if m:
+            return _to_float(m.group("val"))
+    return None
+
+def _capture_energy_kcal(text) -> Optional[float]:
+    pats = [
+        r"(?P<val>\d{1,4}(?:\.\d+)?)\s*(?P<unit>kcal)\b",
+        r"energia\s*\(kcal\)\s*[:\-]?\s*(?P<val>\d{1,4}(?:\.\d+)?)",
+        r"energy\s*\(kcal\)\s*[:\-]?\s*(?P<val>\d{1,4}(?:\.\d+)?)",
+    ]
+    for pat in pats:
+        m = re.search(pat, text, flags=re.I)
+        if m:
+            return _to_float(m.group("val"))
+    return None
+
+LABELS = {
+    "fat": [r"\bfat\b", r"\bzs[ií]r\b", r"\bt[lł]uszcz\b"],
+    "carb": [r"\bcarb(?:ohydrate)?s?\b", r"\bsz[eé]nhidr[aá]t\b", r"\bw[eę]glowodan(?:y)?\b"],
+    "sugar":[r"\bsugar(?:s)?\b", r"\bcukor\b", r"\bcukry\b"],
+    "protein":[r"\bprotein\b", r"\bfeh[eé]rje\b", r"\bbia[lł]ko\b"],
+    "salt":[r"\bsalt\b", r"\bs[oó]\b", r"\bs[oó]l\b"],
+    "sodium":[r"\bsodium\b", r"\bn[aá]trium\b", r"\bs[oó]d\b"],
+}
+
+def _mk_patterns(words):
+    pats = []
+    for w in words:
+        pats.append(rf"{w}[^0-9%]{{0,20}}(?P<val>\d{{1,4}}(?:\.\d+)?)[ ]*(?P<unit>mg|g)?\b")
+    return pats
+
+PAT_FAT      = _mk_patterns(LABELS["fat"])
+PAT_CARB     = _mk_patterns(LABELS["carb"])
+PAT_SUGAR    = _mk_patterns(LABELS["sugar"])
+PAT_PROTEIN  = _mk_patterns(LABELS["protein"])
+PAT_SALT     = _mk_patterns(LABELS["salt"])
+PAT_SODIUM   = _mk_patterns(LABELS["sodium"])
+
+def parse_nutrition(text: str) -> Dict:
+    t = _norm(text)
+    cand = []
+    for blk in re.split(r"\n", t):
+        if "100 g" in blk or "100g" in blk or "per 100" in blk or "100 gr" in blk:
+            cand.append(blk)
+    scope = "\n".join(cand) if cand else t
+
+    kj   = _capture_energy_kj(scope)
+    kcal = _capture_energy_kcal(scope)
+
+    fat      = _capture_value(PAT_FAT, scope)
+    carb     = _capture_value(PAT_CARB, scope)
+    sugar    = _capture_value(PAT_SUGAR, scope)
+    protein  = _capture_value(PAT_PROTEIN, scope)
+    salt     = _capture_value(PAT_SALT, scope)
+    sodium   = _capture_value(PAT_SODIUM, scope)
+
+    if salt is None and sodium is not None:
+        salt = round(sodium * 2.54, 3)
+
+    return {
+        "energy": {"kJ": kj, "kcal": kcal},
+        "fat_g": fat,
+        "carbohydrate_g": carb,
+        "sugar_g": sugar,
+        "protein_g": protein,
+        "salt_g": salt,
+        "sodium_g": sodium,
+        "notes": "values per 100g if available (auto mg→g; salt from sodium×2.54 when applicable)",
+    }

@@ -1,0 +1,61 @@
+from __future__ import annotations
+import re
+from typing import Dict, Any, Tuple
+
+def _norm(text: str) -> str:
+    if not text: return ""
+    text = text.replace("\r","\n")
+    # vírgula decimal
+    text = re.sub(r"(\d),(\d)", r"\1.\2", text)
+    # de-hifenizar
+    text = re.sub(r"(\w)-\s*\n\s*(\w)", r"\1\2", text)
+    # espaços
+    text = re.sub(r"[ \t]+"," ",text)
+    text = re.sub(r"\n{2,}","\n",text)
+    return text
+
+# evita capturar qualquer número perto; foca em labels típicos
+RX_KJ   = re.compile(r"energy[^\\n]*?(\d+(?:\.\d+)?)\s*k[jJ]\b|(\d+(?:\.\d+)?)\s*k[jJ]\b", re.I)
+RX_KCAL = re.compile(r"(?:energy.*?|\b)(\d+(?:\.\d+)?)\s*k?cal\b", re.I)
+def _pick_float(rx: re.Pattern, s: str):
+    m=None
+    for m in rx.finditer(s):
+        for g in m.groups():
+            if g: return float(g)
+    return None
+
+def _pick_g(label_rx: str, s: str):
+    # Ex.: "sugar", "protein", "fat", "carbohydrate", "salt", mas evita words tipo "összesen" etc.
+    rx = re.compile(rf"\b{label_rx}\b[^\\n]*?(\d+(?:\.\d+)?)\s*g\b", re.I)
+    m = rx.search(s)
+    return float(m.group(1)) if m else None
+
+def parse_nutrition(raw_text: str) -> Tuple[Dict[str, Any], list]:
+    t = _norm(raw_text)
+
+    kJ   = _pick_float(RX_KJ, t)
+    kcal = _pick_float(RX_KCAL, t)
+
+    fat  = _pick_g(r"(fat|zsir)", t)
+    carb = _pick_g(r"(carbohydrate|carb|szenhidrat|sz[ée]nhidr[aá]t)", t)
+    sug  = _pick_g(r"(sugar|cukor)", t)
+    prot = _pick_g(r"(protein|feh[eé]rje)", t)
+    salt = _pick_g(r"(salt|so\b|s[oó]?)", t)  # "só" (HU)
+
+    # Alguns rótulos dão só sódio (Na) -> converter: salt = sodium * 2.54
+    sodium = _pick_g(r"(sodium|na\b)", t)
+    if salt is None and sodium is not None:
+        salt = round(sodium * 2.54, 2)
+
+    nutrition = {
+        "energy": {"kJ": kJ, "kcal": kcal},
+        "fat_g": fat,
+        "carbohydrate_g": carb,
+        "sugar_g": sug,
+        "protein_g": prot,
+        "salt_g": salt,
+        "sodium_g": sodium,
+        "notes": "values per 100g if available; sodium→salt when only Na present",
+    }
+    warnings = []
+    return nutrition, warnings

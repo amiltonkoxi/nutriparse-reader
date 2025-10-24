@@ -1,0 +1,112 @@
+"use client";
+
+import React from "react";
+import type { ExtractResponse, AllergenKey, AllergenInfo } from "@/app/lib/types";
+
+const LABEL: Record<AllergenKey,string> = {
+  gluten:"gluten", egg:"egg", crustaceans:"crustaceans", fish:"fish", peanut:"peanut",
+  soy:"soy", milk:"milk", tree_nuts:"tree nuts", celery:"celery", mustard:"mustard",
+};
+
+function chipColor(status: AllergenInfo["status"]) {
+  switch (status) {
+    case "contains": return "bg-rose-600 text-white";
+    case "traces":   return "bg-amber-500 text-white";
+    case "absent":   return "bg-emerald-600 text-white";
+    default:         return "bg-slate-400 text-white";
+  }
+}
+
+function clip(s?: string | null, n = 90) {
+  if (!s) return "";
+  const t = s.replace(/\s+/g, " ").trim();
+  return t.length > n ? t.slice(0, n - 1) + "…" : t;
+}
+
+export default function ResultCard({ data }: { data: ExtractResponse }) {
+  const { meta, allergens, nutrition } = data;
+
+  const order: Record<string, number> = { contains: 3, traces: 2, absent: 1, unknown: 0 };
+  const keys = (Object.keys(allergens) as AllergenKey[]).sort((a, b) =>
+    order[allergens[b].status] - order[allergens[a].status]
+  );
+
+  const evidences = keys
+    .filter(k => allergens[k].status === "contains" || allergens[k].status === "traces")
+    .map(k => ({ key: k, ...allergens[k] }));
+
+  return (
+    <div className="rounded-2xl border border-slate-200 shadow-sm p-4 md:p-5 mb-6">
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <div className="text-sm text-slate-500">
+          <span className="font-medium text-slate-700">File:</span>{" "}
+          {meta?.source_file}
+        </div>
+        <div className="flex items-center gap-2 text-xs">
+          <span className="rounded bg-slate-100 px-2 py-1">{
+            meta?.extraction_mode === "ocr" ? "OCR mode" : "Text mode"
+          }</span>
+          <span className="rounded bg-slate-100 px-2 py-1">
+            Confidence: {Math.round((meta?.confidence ?? 0) * 100)}%
+          </span>
+        </div>
+      </div>
+
+      <h4 className="font-semibold text-slate-800 mb-2">Allergens</h4>
+      <div className="flex flex-wrap gap-2">
+        {keys.map((k) => {
+          const info = allergens[k];
+          return (
+            <span
+              key={k}
+              className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${chipColor(info.status)}`}
+              title={info.evidence ?? ""}
+            >
+              {LABEL[k]}
+              <span className="rounded bg-black/10 px-1.5 py-0.5 text-[10px]">
+                {info.status.toUpperCase()}
+              </span>
+            </span>
+          );
+        })}
+      </div>
+
+      {evidences.length > 0 && (
+        <div className="mt-3 border-l-2 border-slate-200 pl-3">
+          <div className="text-xs text-slate-500 mb-1">evidence</div>
+          <ul className="space-y-1">
+            {evidences.map((e) => (
+              <li key={e.key} className="text-sm text-slate-700">
+                <span className={`mr-2 rounded px-1.5 py-0.5 text-xs ${chipColor(e.status)}`}>
+                  {LABEL[e.key]} · {e.status}
+                </span>
+                <span className="text-slate-600">{clip(e.evidence, 120)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <h4 className="font-semibold text-slate-800 mt-5 mb-2">Nutrition (per 100g)</h4>
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+        {[
+          { label: "Energy", value: nutrition?.energy?.kJ != null ? `${nutrition.energy.kJ} kJ` : "— kJ" },
+          { label: "Fat", value: nutrition?.fat_g != null ? `${nutrition.fat_g} g` : "— g" },
+          { label: "Carbs", value: nutrition?.carbohydrate_g != null ? `${nutrition.carbohydrate_g} g` : "— g" },
+          { label: "Sugar", value: nutrition?.sugar_g != null ? `${nutrition.sugar_g} g` : "— g" },
+          { label: "Protein", value: nutrition?.protein_g != null ? `${nutrition.protein_g} g` : "— g" },
+          { label: "Salt", value: nutrition?.salt_g != null ? `${nutrition?.salt_g}` : "—" },
+        ].map((b) => (
+          <div key={b.label} className="rounded-lg border border-slate-200 p-3 text-center">
+            <div className="text-xs text-slate-500">{b.label}</div>
+            <div className="text-lg font-semibold text-slate-800">{b.value}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-3 text-xs text-slate-500">
+        values per 100g if available (guards around ‘per 100 g’; auto mg→g; kJ→kcal fallback)
+      </div>
+    </div>
+  );
+}

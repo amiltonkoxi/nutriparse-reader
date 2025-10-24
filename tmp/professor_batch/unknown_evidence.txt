@@ -1,0 +1,117 @@
+## 14026 FRISS SERTÉS KARAJ CSN HUN.json
+gluten: (no evidence)
+egg: (no evidence)
+crustaceans: (no evidence)
+fish: (no evidence)
+peanut: (no evidence)
+soy: (no evidence)
+milk: (no evidence)
+tree_nuts: (no evidence)
+celery: (no evidence)
+mustard: (no evidence)
+
+## 16011 FRISS CSIRKE MELLFILÉ VCS  IMP - ANIMEX.json
+gluten: (no evidence)
+egg: (no evidence)
+crustaceans: (no evidence)
+fish: (no evidence)
+peanut: (no evidence)
+soy: (no evidence)
+milk: (no evidence)
+tree_nuts: (no evidence)
+celery: (no evidence)
+mustard: (no evidence)
+
+## 22026 Kukta Gyorsfagyasztott panírozott csirkeszárny termékspecifikáció_aláírva.json
+egg: (no evidence)
+crustaceans: (no evidence)
+fish: (no evidence)
+peanut: (no evidence)
+soy: (no evidence)
+tree_nuts: (no evidence)
+celery: (no evidence)
+
+## 24476_HEKK FILÉ BN 1000_800G 20_ G 1KG_10KG_#.json
+gluten: (no evidence)
+egg: (no evidence)
+crustaceans: (no evidence)
+peanut: (no evidence)
+soy: (no evidence)
+milk: (no evidence)
+tree_nuts: (no evidence)
+celery: (no evidence)
+mustard: (no evidence)
+
+## 31255 KEDVENC ÍZEK FORRÓN FÜSTÖLT KÖTÖZÖTT COMB SONKA KB 1KG VCS (1).json
+egg: (no evidence)
+crustaceans: (no evidence)
+fish: (no evidence)
+peanut: (no evidence)
+tree_nuts: (no evidence)
+
+## 32007 GYULAI KOLBÁSZ KB 2,5KG VG.json
+gluten: (no evidence)
+egg: (no evidence)
+crustaceans: (no evidence)
+fish: (no evidence)
+peanut: (no evidence)
+soy: (no evidence)
+milk: (no evidence)
+tree_nuts: (no evidence)
+celery: (no evidence)
+mustard: (no evidence)
+
+## 50037 - UNIVER ÉDES ANNA 200 GR6DB#.json
+gluten: (no evidence)
+egg: (no evidence)
+crustaceans: (no evidence)
+fish: (no evidence)
+peanut: (no evidence)
+soy: (no evidence)
+milk: (no evidence)
+tree_nuts: (no evidence)
+celery: (no evidence)
+mustard: (no evidence)
+
+## 50180 - CIGÁNDI CÉRNAMETÉLT 4TOJ 5KG.json
+egg: (no evidence)
+crustaceans: (no evidence)
+fish: (no evidence)
+peanut: (no evidence)
+soy: (no evidence)
+milk: (no evidence)
+tree_nuts: (no evidence)
+celery: (no evidence)
+mustard: (no evidence)
+
+## 60055 MEDVE KÖRDOBOZOS SAJT SONKÁS 6 CIKKES 200G.json
+gluten: (no evidence)
+egg: (no evidence)
+crustaceans: (no evidence)
+fish: (no evidence)
+peanut: (no evidence)
+soy: (no evidence)
+milk: (no evidence)
+tree_nuts: (no evidence)
+celery: (no evidence)
+mustard: (no evidence)
+
+## 60118 NÁDUDVARI JOGHURT NATÚR 3_ 900G.json
+gluten: (no evidence)
+crustaceans: (no evidence)
+soy: (no evidence)
+tree_nuts: (no evidence)
+
+## 90327_HC ZSÍROLDÓ COMBI GRILL 1L 6DB#_2.json
+gluten: (no evidence)
+egg: (no evidence)
+crustaceans: (no evidence)
+fish: (no evidence)
+peanut: (no evidence)
+soy: (no evidence)
+milk: (no evidence)
+tree_nuts: (no evidence)
+celery: (no evidence)
+mustard: (no evidence)
+
+## agg_allergens.json

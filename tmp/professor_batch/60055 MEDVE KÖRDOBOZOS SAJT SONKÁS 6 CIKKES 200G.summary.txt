@@ -1,0 +1,22 @@
+File: 60055 MEDVE KÖRDOBOZOS SAJT SONKÁS 6 CIKKES 200G.pdf
+Confidence: 75%
+
+Allergens:
+ - gluten: unknown
+ - egg: unknown
+ - crustaceans: unknown
+ - fish: unknown
+ - peanut: unknown
+ - soy: unknown
+ - milk: unknown
+ - tree_nuts: unknown
+ - celery: unknown
+ - mustard: unknown
+
+Nutrition per 100g:
+  Energy: — kJ / — kcal
+  Fat: — g
+  Carbs: — g
+  Sugar: — g
+  Protein: — g
+  Salt: — g

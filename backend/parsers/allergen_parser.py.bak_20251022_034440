@@ -1,0 +1,50 @@
+from __future__ import annotations
+import re
+from typing import Dict, Tuple, List
+
+AllergenKey = str
+Status = str
+
+BASE: Dict[AllergenKey, Dict[str, List[str]]] = {
+  "gluten":       {"contains": [r"\bgluten\b", r"\bwheat\b", r"\bbuza\b"], "traces": [r"may contain.*gluten", r"nyomokban.*gluten"], "absent": [r"gluten[-\s]*free", r"nem tartalmaz.*gluten", r"allergen anyagokat nem tartalmaz"]},
+  "egg":          {"contains": [r"\begg\b", r"\btojas\b"], "traces": [r"may contain.*egg", r"nyomokban.*tojas"], "absent": [r"egg[-\s]*free", r"nem tartalmaz.*tojas", r"allergen anyagokat nem tartalmaz"]},
+  "crustaceans":  {"contains": [r"crustacean", r"\brak\b"], "traces": [r"may contain.*crustaceans?"], "absent": [r"no crustaceans", r"nem tartalmaz.*rak", r"allergen anyagokat nem tartalmaz"]},
+  "fish":         {"contains": [r"\bfish\b", r"\bhal\b"], "traces": [r"may contain.*fish"], "absent": [r"no fish", r"nem tartalmaz.*hal", r"allergen anyagokat nem tartalmaz"]},
+  "peanut":       {"contains": [r"\bpeanut\b", r"\bfoldimogyoro\b"], "traces": [r"may contain.*peanuts?"], "absent": [r"peanut[-\s]*free", r"nem tartalmaz.*foldimogyorot", r"allergen anyagokat nem tartalmaz"]},
+  "soy":          {"contains": [r"\bsoy\b", r"\bszoja\b"], "traces": [r"may contain.*soy"], "absent": [r"soy[-\s]*free", r"nem tartalmaz.*szojat", r"allergen anyagokat nem tartalmaz"]},
+  "milk":         {"contains": [r"\bmilk\b", r"\btej\b", r"\blactose\b", r"\blaktoz\b"], "traces": [r"may contain.*milk"], "absent": [r"milk[-\s]*free", r"lactose[-\s]*free", r"nem tartalmaz.*tejet", r"allergen anyagokat nem tartalmaz"]},
+  "tree_nuts":    {"contains": [r"hazelnut", r"walnut", r"almond", r"cashew", r"pistachio", r"pecan", r"brazil\s+nut", r"\bdio\b"], "traces": [r"may contain.*nuts?"], "absent": [r"nut[-\s]*free", r"nem tartalmaz.*diofeleket", r"allergen anyagokat nem tartalmaz"]},
+  "celery":       {"contains": [r"\bcelery\b", r"\bzeller\b"], "traces": [r"may contain.*celery"], "absent": [r"no celery", r"nem tartalmaz.*zellert", r"allergen anyagokat nem tartalmaz"]},
+  "mustard":      {"contains": [r"\bmustard\b", r"\bmustar\b"], "traces": [r"may contain.*mustard"], "absent": [r"no mustard", r"nem tartalmaz.*mustart", r"allergen anyagokat nem tartalmaz"]},
+}
+
+SEC_HEADINGS = [r"\ballergens?\b", r"\ballergen informacio?k\b", r"\ballergeny\b"]
+PRIORITY = ["contains", "traces", "absent"]
+
+def _evidence(line: str, pat: str) -> str:
+    line = line.strip()
+    return (line[:220] + "…") if len(line) > 220 else line
+
+def _find_best(text: str, patterns: Dict[str, List[str]]) -> Tuple[Status, str|None]:
+    for st in PRIORITY:
+        for pat in patterns.get(st, []):
+            if re.search(pat, text, flags=re.I):
+                return st, _evidence(text, pat)
+    return "unknown", None
+
+def parse_allergens(text: str) -> Dict[str, Dict[str, str|None]]:
+    result = {k: {"status": "unknown", "evidence": None} for k in BASE.keys()}
+    lines = [l.strip() for l in text.splitlines() if l.strip()]
+    # janelas sob "Allergens"
+    idxs = [i for i,l in enumerate(lines) if any(re.search(h, l, flags=re.I) for h in SEC_HEADINGS)]
+    windows = ["\n".join(lines[i:i+25]) for i in idxs]
+    def apply(scope: str):
+        order = {"contains":3, "traces":2, "absent":1, "unknown":0}
+        for key, pats in BASE.items():
+            st, evi = _find_best(scope, pats)
+            cur = result[key]["status"]
+            if order.get(st,0) > order.get(cur,0):
+                result[key] = {"status": st, "evidence": evi}
+    for w in windows: apply(w)
+    apply(text)
+    return result

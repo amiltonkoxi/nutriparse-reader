@@ -1,0 +1,104 @@
+from __future__ import annotations
+import re
+from typing import Dict, Optional
+from unidecode import unidecode
+
+ALLERGEN_KEYS = [
+    "gluten","egg","crustaceans","fish","peanut","soy","milk","tree_nuts","celery","mustard"
+]
+
+# sinónimos (PT/EN/HU básicos) – tudo minúsculo e sem acentos via unidecode
+SYN = {
+    "gluten":       ["gluten","wheat","buza","búza"],
+    "egg":          ["egg","eggs","tojas","tojás"],
+    "crustaceans":  ["crustaceans","shellfish","rak","rák"],
+    "fish":         ["fish","hal"],
+    "peanut":       ["peanut","foldimogyoro","földimogyoró"],
+    "soy":          ["soy","soya","szója","soja"],
+    "milk":         ["milk","tej"],
+    "tree_nuts":    ["tree nut","mogyoro","mogyoró","dio","dió","mandula","kesudio","kesudió","pisztacia","diosk","diófélék"],
+    "celery":       ["celery","zeller"],
+    "mustard":      ["mustard","mustar","mustár"],
+}
+
+def _norm(text: str) -> str:
+    if not text:
+        return ""
+    text = text.replace("\r","\n")
+    text = re.sub(r"(\d),(\d)", r"\1.\2", text)  # vírgula decimal
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n{2,}", "\n", text)
+    # baixar para minúsculas + remover acento para bater com padrões
+    return unidecode(text).lower()
+
+# padrões HU/EN (já normalizados) – ordem importa (negação antes do "contains")
+PATTERNS = {
+    "absent":  [
+        r"nem\s+tartalmaz",              # húngaro: não contém
+        r"mentes\b",                     # “X mentes”
+        r"does\s+not\s+contain",
+        r"free\s+from",
+    ],
+    "traces": [
+        r"nyomokban\s+(?:is\s+)?(?:tartalmazhat|elo(?:fordulhat)?)",  # “nyomokban tartalmazhat”
+        r"trace(?:s)?\s+of",
+        r"may\s+contain\s+traces\s+of",
+        r"may\s+contain",               # fallback leve (último)
+    ],
+    "contains":[
+        r"\btartalmaz\b",               # húngaro: contém
+        r"\bcontains?\b",
+        r"\binclude(?:s)?\b",
+    ],
+}
+
+def _match_status(hay: str, needles) -> Optional[re.Match]:
+    for pat in needles:
+        m = re.search(pat, hay)
+        if m:
+            return m
+    return None
+
+def parse_allergens(text: str) -> Dict[str, Dict[str, Optional[str]]]:
+    """
+    Retorna p/ cada alergénio:
+      { status: 'contains'|'traces'|'absent'|'unknown', evidence: <trecho> }
+    Estratégia: procurar linha/frase onde apareça o sinónimo do alergénio + algum
+    gatilho de contains/traces/absent.
+    """
+    full = _norm(text)
+
+    # tokenizar por linhas curtas para evidência mais limpa
+    lines = [ln.strip() for ln in re.split(r"\n+", full) if ln.strip()]
+
+    def find_status_for(term_list):
+        # Construir regex OR com as variantes desse alergénio
+        # ex.: (gluten|wheat|buza)
+        term_re = r"(?:%s)" % "|".join(re.escape(unidecode(t).lower()) for t in term_list)
+
+        # 1) ABSENT tem prioridade sobre CONTAINS
+        for ln in lines:
+            if re.search(term_re, ln):
+                if _match_status(ln, PATTERNS["absent"]):
+                    return "absent", ln
+
+        # 2) TRACES
+        for ln in lines:
+            if re.search(term_re, ln):
+                if _match_status(ln, PATTERNS["traces"]):
+                    return "traces", ln
+
+        # 3) CONTAINS
+        for ln in lines:
+            if re.search(term_re, ln):
+                if _match_status(ln, PATTERNS["contains"]):
+                    return "contains", ln
+
+        # 4) UNKNOWN
+        return "unknown", None
+
+    out: Dict[str, Dict[str, Optional[str]]] = {}
+    for key in ALLERGEN_KEYS:
+        status, ev = find_status_for(SYN[key])
+        out[key] = {"status": status, "evidence": ev}
+    return out

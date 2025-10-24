@@ -166,10 +166,6 @@ app.add_middleware(
     allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
 )
 
-_per100_re = re.compile(r"(?:per|/)\s*100\s*g|100\s*g\b|100g\b", re.I)
-_per100ml_re = re.compile(r"(?:per|/)\s*100\s*ml|100\s*ml\b|100ml\b", re.I)
-_per_portion_re = re.compile(r"(?:per\s+(?:portion|serving))|adagonkent|adagonkent", re.I)
-
 @app.get("/health")
 def health():
     return {"status": "ok"}
@@ -192,17 +188,11 @@ async def extract(file: UploadFile = File(...)):
 
         allergens_parsed = parse_allergens(t)
         allergens = _normalize_allergens(allergens_parsed)
-        nutrition_values, nutrition_evidence, nutrition_note = parse_nutrition(t)
+        nutrition_values, nutrition_evidence, nutrition_note, serving_info = parse_nutrition(t)
 
-        # detect serving basis
-        if _per100_re.search(t_norm):
-            serving_basis = "per 100g"
-        elif _per100ml_re.search(t_norm):
-            serving_basis = "per 100ml"
-        elif _per_portion_re.search(t_norm):
-            serving_basis = "per portion"
-        else:
-            serving_basis = "unknown"
+        serving_basis = serving_info.get("basis") or "unknown"
+        serving_basis_evidence = serving_info.get("evidence")
+        serving_basis_inferred = bool(serving_info.get("inferred"))
 
         product_name_text = _extract_product_name(t)
         product_name_file = _guess_name_from_filename(file.filename)
@@ -263,6 +253,7 @@ async def extract(file: UploadFile = File(...)):
                 "source_file": file.filename,
                 "extraction_mode": mode,
                 "serving_basis": serving_basis,
+                "serving_basis_inferred": serving_basis_inferred,
                 "languages": langs,
                 "confidence": confidence
             },
@@ -274,6 +265,7 @@ async def extract(file: UploadFile = File(...)):
                 "pages_scanned": (t.count("\n") // 40) if t else 0,
                 "raw_text_preview": (t[:2000] if t else ""),
                 "nutrition_evidence": nutrition_evidence,
+                "serving_basis_evidence": serving_basis_evidence,
                 "notes": notes or None,
             }
         }

@@ -1,0 +1,140 @@
+from __future__ import annotations
+import re
+from typing import Dict, List, Tuple, Optional
+from unidecode import unidecode
+
+ALLERGEN_KEYS = [
+    "gluten","egg","crustaceans","fish","peanut","soy","milk","tree_nuts","celery","mustard"
+]
+
+# sinônimos EN + HU (normalizados com unidecode, tudo minúsculo)
+SYN = {
+    "gluten":       ["gluten","wheat","buza"],
+    "egg":          ["egg","tojas"],
+    "crustaceans":  ["crustacean","crustaceans","rak","rakfelek"],
+    "fish":         ["fish","hal"],
+    "peanut":       ["peanut","foldimogyoro"],
+    "soy":          ["soy","soja","szoja"],
+    "milk":         ["milk","tej","lactose","laktoz","tejszarmazek"],
+    "tree_nuts":    ["tree nut","tree nuts","dio","diofelek","hazelnut","walnut","almond","cashew","pistachio","pecan","brazil nut","brazil dio"],
+    "celery":       ["celery","zeller"],
+    "mustard":      ["mustard","mustar"],
+}
+
+# frases globais: "sem alergénicos" (EN/HU)
+GLOBAL_ABSENT_PATTERNS = [
+    r"\bno allergens?\b",
+    r"\bfree from allergens?\b",
+    r"\bdoes not contain (any )?allergen(s)?\b",
+    r"\bnincs allerg[eé]n\b",
+    r"\ballerg[eé]n anyagokat nem tartalmaz\b",
+]
+
+# "Allergen information: fish" (HU/EN) -> fish contains, demais absent
+FISH_ONLY_INFO = [
+    r"allerg[eé]n inform[aá]ci[oó].*?\bhal\b",     # HU: Allergén információ: hal
+    r"allergen (?:info(?:rmation)?|information).*?\bfish\b",  # EN
+]
+
+# Ajuda: ranking de status
+RANK = {"unknown":0, "absent":1, "traces":2, "contains":3}
+
+def _norm(text: str) -> str:
+    t = unidecode(text or "").lower()
+    t = t.replace("\r", "\n")
+    # normalizar múltiplos espaços/linhas
+    t = re.sub(r"[ \t]+", " ", t)
+    t = re.sub(r"\n{2,}", "\n", t)
+    return t
+
+def _empty_result() -> Dict[str, Dict[str, Optional[str]]]:
+    return {k: {"status": "unknown", "evidence": None} for k in ALLERGEN_KEYS}
+
+def _bump(res: Dict[str, Dict[str, Optional[str]]], key: str, status: str, evidence: Optional[str]):
+    if key not in res: 
+        return
+    cur = res[key]["status"]
+    if RANK[status] > RANK[cur]:
+        res[key]["status"] = status
+        res[key]["evidence"] = evidence
+
+def _any_match(patterns: List[str], text: str) -> Optional[str]:
+    for p in patterns:
+        m = re.search(p, text, flags=re.I)
+        if m:
+            return m.group(0)
+    return None
+
+def parse_allergens(raw_text: str) -> Dict[str, Dict[str, Optional[str]]]:
+    """
+    Regras EN + HU:
+      - 'no allergens' / 'nincs allergén' / '... nem tartalmaz allergén'  -> tudo ABSENT
+      - 'Allergén információ: hal' / 'allergen information: fish'         -> fish CONTAINS, demais ABSENT
+      - 'contains X' / 'tartalmaz X'                                      -> X CONTAINS
+      - 'may contain X' / 'nyomokban ... tartalmazhat'                    -> X TRACES
+      - fallback: procura por nomes avulsos: se 'contains' ou 'may contain' não aparecer, não força CONTAINS.
+    """
+    text = raw_text or ""
+    norm = _norm(text)
+    res = _empty_result()
+
+    # 1) caso global: nenhum alergénico
+    ev = _any_match(GLOBAL_ABSENT_PATTERNS, norm)
+    if ev:
+        for k in ALLERGEN_KEYS:
+            _bump(res, k, "absent", ev)
+        return res
+
+    # 2) caso "allergen info: fish"
+    ev = _any_match(FISH_ONLY_INFO, norm)
+    if ev:
+        for k in ALLERGEN_KEYS:
+            _bump(res, k, "absent", ev)
+        _bump(res, "fish", "contains", ev)
+        return res
+
+    # 3) regras gerais: "contains ..." (EN/HU)
+    #    pegamos janelas depois de 'contains' / 'tartalmaz'
+    #    exemplo HU: "A termek tartalmaz tejet, zellert"
+    CONTAINS_TRIGGERS = [r"\bcontains\b", r"\btartalmaz\b"]
+    TRACES_TRIGGERS   = [r"\bmay contain\b", r"\bnyomokban\b.*?\btartalmazhat\b"]
+
+    # procurar blocos tipo "contains XXX" / "tartalmaz XXX"
+    for trig in CONTAINS_TRIGGERS:
+        for m in re.finditer(trig + r"([^.\n]{0,120})", norm, flags=re.I):
+            window = m.group(1)
+            ev_here = m.group(0) + window
+            for key, names in SYN.items():
+                for token in names:
+                    if re.search(rf"\b{re.escape(token)}(ok|ek|et|et|ot|ot)?\b", window):
+                        _bump(res, key, "contains", ev_here)
+                        break
+
+    # procurar blocos "may contain XXX" / "nyomokban ... tartalmazhat"
+    # tratamos duas formas: EN simples e HU que costuma ter "nyomokban diót, tejet tartalmazhat"
+    # — primeiro: janela depois de 'may contain'
+    for m in re.finditer(r"\bmay contain\b([^.\n]{0,150})", norm, flags=re.I):
+        window = m.group(1)
+        ev_here = m.group(0) + window
+        for key, names in SYN.items():
+            for token in names:
+                if re.search(rf"\b{re.escape(token)}\b", window):
+                    _bump(res, key, "traces", ev_here)
+                    break
+
+    # — segundo: padrão HU "nyomokban ... tartalmazhat"
+    for m in re.finditer(r"nyomokban([^.\n]{0,150})tartalmazhat", norm, flags=re.I):
+        window = m.group(1)
+        ev_here = m.group(0)
+        for key, names in SYN.items():
+            for token in names:
+                if re.search(rf"\b{re.escape(token)}\b", window):
+                    _bump(res, key, "traces", ev_here)
+                    break
+
+    # 4) fallback leve: se texto citar explicitamente "allergen information" + lista que contenha HU/EN
+    #    marcamos CONTAINS apenas se estiver junto a 'fish/hal' ou outra palavra seguida de 'contains/tartalmaz'.
+    #    (evitamos falsos positivos por menções isoladas)
+    #    -> já coberto pelas janelas acima; não forçamos nada aqui.
+
+    return res

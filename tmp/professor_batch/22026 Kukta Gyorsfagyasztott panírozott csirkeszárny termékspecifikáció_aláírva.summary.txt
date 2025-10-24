@@ -1,0 +1,22 @@
+File: 22026 Kukta Gyorsfagyasztott panírozott csirkeszárny termékspecifikáció_aláírva.pdf
+Confidence: 75%
+
+Allergens:
+ - gluten: contains (→ k a kovetkezo allergeneket tartalmazza: gluten nyomokban tejet, zeller...)
+ - egg: unknown
+ - crustaceans: unknown
+ - fish: unknown
+ - peanut: unknown
+ - soy: unknown
+ - milk: traces (→ jet, zellert, szojat tartalmazhat. 01 + milk protein/ tejfeherje 15 - ...)
+ - tree_nuts: unknown
+ - celery: unknown
+ - mustard: contains (→ e/kukorica 35 - lupine/csillagfurt 36 - mustard/mustarmag osszetevok j...)
+
+Nutrition per 100g:
+  Energy: 1173.0 kJ / 282.0 kcal
+  Fat: 18.9 g
+  Carbs: 8.7 g
+  Sugar: 0.6 g
+  Protein: 15.0 g
+  Salt: 2.3 g

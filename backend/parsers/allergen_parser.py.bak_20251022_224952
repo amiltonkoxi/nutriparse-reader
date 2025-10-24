@@ -1,0 +1,146 @@
+from __future__ import annotations
+import re
+from typing import Dict, List, Tuple
+from unidecode import unidecode
+
+# ---- Allergens we report (keys must match frontend) ----
+ALLERGENS = [
+    "gluten",
+    "egg",
+    "crustaceans",
+    "fish",
+    "peanut",
+    "soy",
+    "milk",
+    "tree_nuts",
+    "celery",
+    "mustard",
+]
+
+# ---- Synonyms (EN + HU). We'll normalize with unidecode & lowercase. ----
+SYN = {
+    "gluten": [
+        "gluten", "glutén", "glutenmentes", "búza", "buza", "búzaliszt", "buzaliszt",
+        "wheat", "barley", "rye", "maláta", "malata", "durum"
+    ],
+    "egg": [
+        "egg", "eggs", "tojás", "tojas", "tojásfehérje", "tojasfeherje", "tojássárgája", "tojassargaja",
+        "albumin", "ovalbumin"
+    ],
+    "crustaceans": [
+        "crustaceans", "rákfélék", "rakfelek", "rák", "rak", "garnéla", "garnela", "shrimp",
+        "krill", "langoustine", "crab", "lobster"
+    ],
+    "fish": ["fish", "hal", "tonhal", "tuna", "lazac", "salmon", "cod", "tőkehal", "tokehal"],
+    "peanut": ["peanut", "földimogyoró", "foldimogyoro", "mogyoró", "mogyoro", "arachis"],
+    "soy": ["soy", "soja", "szója", "szoja", "soybean", "szójalecitin", "szojalecitin", "lecithin"],
+    "milk": [
+        "milk", "tej", "tejpor", "tejsavó", "tejsavo", "whey", "lactose", "laktóz", "laktoz",
+        "kazein", "casein", "sajt", "cheese"
+    ],
+    "tree_nuts": [
+        "tree nuts", "nuts", "dió", "dio", "mogyorófa", "mandula", "almond", "hazelnut", "mogyoró", "mogyoro",
+        "pistachio", "pisztácia", "pisztacia", "kesudió", "kesudio", "pekándió", "pekandio",
+        "brazil dió", "brazil dio", "walnut", "pecan", "cashew", "macadamia"
+    ],
+    "celery": ["celery", "zeller"],
+    "mustard": ["mustard", "mustár", "mustar"],
+}
+
+# ---- Triggers / cues (normalized) ----
+CONTAINS_TRIGGERS = [
+    "contains", "tartalmaz", "megtalalhato", "tartalmazza",
+]
+TRACES_TRIGGERS = [
+    "may contain", "traces", "trace", "nyomokban", "tartalmazhat", "elo fordulhat", "elofordulhat",
+]
+ABSENT_TRIGGERS = [
+    "free", "-free", "mentes", "nem tartalmaz", "not contain", "does not contain", "without"
+]
+
+# Precompile regex for speed
+def _compile(words: List[str]) -> re.Pattern:
+    esc = [re.escape(w) for w in words]
+    return re.compile(r"\b(" + "|".join(esc) + r")\b", re.IGNORECASE)
+
+RX_CONTAINS = _compile(CONTAINS_TRIGGERS)
+RX_TRACES = _compile(TRACES_TRIGGERS)
+RX_ABSENT = _compile(ABSENT_TRIGGERS)
+
+# Build per-allergen synonym regex
+SYN_RX: Dict[str, re.Pattern] = {}
+for key, terms in SYN.items():
+    # normalize to ascii-lower
+    norm_terms = sorted(set(unidecode(t).lower() for t in terms))
+    SYN_RX[key] = _compile(norm_terms)
+
+# --- utility: normalize text before parsing ---
+def _normalize(text: str) -> str:
+    if not text:
+        return ""
+    t = text
+    # dehyphenate linebreak splits: "tarta-\nLmaz"
+    t = re.sub(r"(\w)-\s*\n\s*(\w)", r"\1\2", t)
+    t = t.replace("\r", "\n")
+    # collapse spaces
+    t = re.sub(r"[ \t]+", " ", t)
+    t = re.sub(r"\n{2,}", "\n", t)
+    # ascii-lower
+    t = unidecode(t).lower()
+    return t
+
+def _status_priority(s: str) -> int:
+    # higher is stronger
+    return {"unknown": 0, "absent": 1, "traces": 2, "contains": 3}[s]
+
+def _upgrade(cur: Tuple[str, str|None], new: Tuple[str, str|None]) -> Tuple[str, str|None]:
+    return new if _status_priority(new[0]) > _status_priority(cur[0]) else cur
+
+def _snippet(text: str, start: int, end: int, extra: int = 40) -> str:
+    lo = max(0, start - extra); hi = min(len(text), end + extra)
+    return text[lo:hi].strip()
+
+def parse_allergens(text: str, languages: List[str] | None = None) -> Dict[str, Dict[str, str | None]]:
+    """
+    Heuristic parser for allergens (EN + HU).
+    Returns: { allergen_key: { status: 'contains'|'traces'|'absent'|'unknown', evidence: str|None } }
+    """
+    norm = _normalize(text)
+
+    # default result
+    result: Dict[str, Tuple[str, str | None]] = {k: ("unknown", None) for k in ALLERGENS}
+
+    # 1) Quick list after "Allergens:" / "Allergének:" → treat as contains if list appears
+    for m in re.finditer(r"\ballergen(?:s|ek)\s*[:\-]\s*(.+)", norm):
+        seg = m.group(1)[:200]  # first ~200 chars
+        for k, rx in SYN_RX.items():
+            for m2 in rx.finditer(seg):
+                result[k] = _upgrade(result[k], ("contains", _snippet(norm, m.start(), m.end())))
+
+    # 2) Windowed context scan around each synonym occurrence
+    # Window: ±60 chars
+    for k, rx in SYN_RX.items():
+        for m in rx.finditer(norm):
+            s, e = m.span()
+            win_lo, win_hi = max(0, s - 60), min(len(norm), e + 60)
+            win = norm[win_lo:win_hi]
+
+            evidence = _snippet(norm, s, e)
+            # Order matters: contains > traces > absent
+            if RX_CONTAINS.search(win):
+                result[k] = _upgrade(result[k], ("contains", evidence))
+            elif RX_TRACES.search(win):
+                result[k] = _upgrade(result[k], ("traces", evidence))
+            elif RX_ABSENT.search(win):
+                # For "gluten free" or "nem tartalmaz tejet" → absent
+                result[k] = _upgrade(result[k], ("absent", evidence))
+
+    # 3) Additional explicit patterns for HU negatives like: "<allergen> mentes"
+    for k, rx in SYN_RX.items():
+        for m in re.finditer(rf"{rx.pattern}\s+(?:\w+\s+)?mentes", norm):
+            result[k] = _upgrade(result[k], ("absent", _snippet(norm, *m.span())))
+        for m in re.finditer(rf"nem\s+tartalmaz\s+.*?{rx.pattern}", norm):
+            result[k] = _upgrade(result[k], ("absent", _snippet(norm, *m.span())))
+
+    # Final shape
+    return {k: {"status": result[k][0], "evidence": result[k][1]} for k in ALLERGENS}

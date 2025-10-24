@@ -46,6 +46,10 @@ def _clip_snippet(snippet: str, max_len: int = 60) -> str:
     return cleaned[:max_len].rstrip(",.;:- ")
 
 
+def _clip_match(text: str, match: re.Match, pad: int = 40) -> str:
+    return _clip_snippet(text[max(0, match.start() - pad): match.end() + pad])
+
+
 _GE_PATTERNS = [
     r"nie\s+mniej\s+niz",
     r"no?\s+less\s+than",
@@ -70,6 +74,25 @@ _LE_PATTERNS = [
 
 _GE_REGEXES = [re.compile(pat) for pat in _GE_PATTERNS]
 _LE_REGEXES = [re.compile(pat) for pat in _LE_PATTERNS]
+
+_SERVING_PER100_PATTERNS = [
+    re.compile(r"(?:per|/)\s*100\s*g", re.IGNORECASE),
+    re.compile(r"\b100\s*g\b", re.IGNORECASE),
+    re.compile(r"\b100g\b", re.IGNORECASE),
+    re.compile(r"átlagos\s+tápérték(?:tartalom)?\s+.*100\s*g", re.IGNORECASE),
+    re.compile(r"average\s+values?\s+per\s+100\s*g", re.IGNORECASE),
+]
+
+_SERVING_PORTION_PATTERNS = [
+    (re.compile(r"(?:per|/)\s*100\s*ml", re.IGNORECASE), lambda m: "per 100ml"),
+    (re.compile(r"\b100\s*ml\b", re.IGNORECASE), lambda m: "per 100ml"),
+    (re.compile(r"\bper\s+serving\b", re.IGNORECASE), lambda m: "per serving"),
+    (re.compile(r"\bper\s+portion\b", re.IGNORECASE), lambda m: "per portion"),
+    (re.compile(r"\bserving\s+size\b", re.IGNORECASE), lambda m: "per serving"),
+    (re.compile(r"\badagonk[ée]nt\b", re.IGNORECASE), lambda m: "per serving"),
+    (re.compile(r"\bpor\s+por[cç][aã]o\b", re.IGNORECASE), lambda m: "per serving"),
+    (re.compile(r"\bper\s+(\d+\s*(?:g|ml|db|slice|portion))\b", re.IGNORECASE), lambda m: f"per {m.group(1).strip()}"),
+]
 
 
 def _format_number(value: float) -> str:
@@ -214,6 +237,30 @@ def _match_line_value(
     return None, None
 
 
+def _detect_serving_basis(
+    raw_text: str,
+    values: Dict[str, Union[float, str, None]],
+) -> Tuple[Optional[str], Optional[str], bool, Optional[str]]:
+    for pattern in _SERVING_PER100_PATTERNS:
+        match = pattern.search(raw_text)
+        if match:
+            return "per 100g", _clip_match(raw_text, match), False, None
+
+    for pattern, formatter in _SERVING_PORTION_PATTERNS:
+        match = pattern.search(raw_text)
+        if match:
+            return formatter(match), _clip_match(raw_text, match), False, None
+
+    energy_pair = values.get("energy_kJ") is not None and values.get("energy_kcal") is not None
+    macro_keys = ["fat_g", "carbohydrate_g", "sugars_g", "protein_g", "salt_g"]
+    macro_count = sum(1 for key in macro_keys if values.get(key) is not None)
+    if energy_pair and macro_count >= 3:
+        note = "Serving basis assumed per 100 g (no explicit serving found)."
+        return "per 100g", None, True, note
+
+    return None, None, False, None
+
+
 def _match_dash_line(
     label_terms: Iterable[str],
     raw_lines: Iterable[str],
@@ -300,7 +347,25 @@ NUTRIENT_LABELS = {
 }
 
 NUTRIENT_EXCLUDES = {
-    "protein_g": ("hanyad", "hanyados", "háanyad", "háanyados", "kotoszovetmentes", "legalabb", "ratio"),
+    "protein_g": (
+        "hanyad",
+        "hanyados",
+        "háanyad",
+        "háanyados",
+        "kotoszovetmentes",
+        "legalabb",
+        "ratio",
+        "milk protein",
+        "soy protein",
+        "whey protein",
+        "protein isolate",
+        "protein concentrate",
+        "protein powder",
+        "protein blend",
+        "pea protein",
+        "vegetable protein",
+        "protein from",
+    ),
 }
 
 
@@ -390,7 +455,12 @@ def _match_saturated(text: str) -> Tuple[Optional[float], Optional[str]]:
     return None, None
 
 # -------- main --------
-def parse_nutrition(raw_text: str) -> Tuple[Dict[str, Union[float, str, None]], Dict[str, Optional[str]], Optional[str]]:
+def parse_nutrition(raw_text: str) -> Tuple[
+    Dict[str, Union[float, str, None]],
+    Dict[str, Optional[str]],
+    Optional[str],
+    Dict[str, Optional[Union[str, bool]]],
+]:
     """Parse nutrition panels in Hungarian/English text and noisy OCR output."""
     t = _clean(raw_text)
     raw_lines = raw_text.splitlines()
@@ -545,6 +615,9 @@ def parse_nutrition(raw_text: str) -> Tuple[Dict[str, Union[float, str, None]], 
             sugars_val = round(sugars_val / 10.0, 3)
         values["sugars_g"] = sugars_val
 
+    serving_basis, serving_evidence, serving_inferred, inferred_note = _detect_serving_basis(raw_text, values)
+    if inferred_note:
+        note = f"{note}; {inferred_note}" if note else inferred_note
 
     for optional_key in ("collagen_g", "water_g"):
         if values.get(optional_key) is None:
@@ -568,8 +641,12 @@ def parse_nutrition(raw_text: str) -> Tuple[Dict[str, Union[float, str, None]], 
             return float(round(value))
         return float(round(value, 1))
 
-    normalized = {}
-    for key, value in values.items():
-        normalized[key] = _normalize_numeric(key, value)
+    normalized = {key: _normalize_numeric(key, value) for key, value in values.items()}
 
-    return normalized, evidence, note
+    serving_info = {
+        "basis": serving_basis,
+        "evidence": serving_evidence,
+        "inferred": serving_inferred,
+    }
+
+    return normalized, evidence, note, serving_info

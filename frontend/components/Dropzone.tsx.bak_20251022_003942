@@ -1,0 +1,64 @@
+"use client";
+import { useCallback, useRef, useState } from "react";
+
+type Props = {
+  onFiles: (files: File[]) => void;
+  max?: number;
+};
+
+export default function Dropzone({ onFiles, max = 5 }: Props) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [isOver, setIsOver] = useState(false);
+
+  const pick = () => inputRef.current?.click();
+
+  const handleFiles = (list: FileList | null) => {
+    if (!list) return;
+    const all = Array.from(list).filter(f => f.type === "application/pdf");
+    const capped = all.slice(0, max);
+    if (capped.length) onFiles(capped);
+  };
+
+  const onDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsOver(false);
+    handleFiles(e.dataTransfer.files);
+  }, []);
+
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsOver(true);
+  };
+
+  const onDragLeave = () => setIsOver(false);
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={pick}
+      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && pick()}
+      onDrop={onDrop}
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      className={`rounded-2xl border-2 border-dashed bg-white p-10 text-center transition
+        ${isOver ? "border-emerald-500 bg-emerald-50" : "border-slate-300 hover:bg-slate-50"}`}
+      aria-label="Drag and drop up to 5 PDF files, or click to select"
+    >
+      <input
+        ref={inputRef}
+        type="file"
+        accept="application/pdf"
+        multiple
+        className="hidden"
+        onChange={(e) => handleFiles(e.target.files)}
+      />
+      <div className="mx-auto flex max-w-lg flex-col items-center gap-3">
+        <div className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">Up to 5 PDFs</div>
+        <h2 className="text-lg font-semibold">Drag & drop your PDF files here</h2>
+        <p className="text-sm text-slate-500">or click to browse</p>
+      </div>
+    </div>
+  );
+}

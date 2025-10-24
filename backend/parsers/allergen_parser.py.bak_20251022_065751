@@ -1,0 +1,101 @@
+from __future__ import annotations
+import re
+from typing import Dict
+from unidecode import unidecode
+
+ALLERGENS = [
+    "gluten","egg","crustaceans","fish","peanut","soy","milk","tree_nuts","celery","mustard"
+]
+
+# sinónimos EN/HU (normalizados com unidecode e minúsculas)
+SYN = {
+    "gluten":       ["gluten", "glutén", "glutenmentes", "buza", "búza"],
+    "egg":          ["egg", "tojás", "tojas"],
+    "crustaceans":  ["crustaceans", "rakfelek", "rákfélék", "rak", "rák"],
+    "fish":         ["fish", "hal"],
+    "peanut":       ["peanut", "foldimogyoro", "földimogyoró", "mogyoró", "mogyoro"],
+    "soy":          ["soy", "soja", "szója", "szoja"],
+    "milk":         ["milk", "tej", "laktóz", "laktoz"],
+    "tree_nuts":    ["tree nuts", "diofelek", "diófélék", "dió", "dio", "mandula", "kesudio", "kesudió", "mogyoró", "pekandio", "pekándió", "pisztácia"],
+    "celery":       ["celery", "zeller"],
+    "mustard":      ["mustard", "mustar", "mustár"],
+}
+
+# padrões de status (prioridade: contains > traces > absent)
+PATTERNS = {
+    "contains": re.compile(r"\b(tartalmaz|contains)\b", re.IGNORECASE),
+    "traces":   re.compile(r"\b(nyomokban|trace[s]?|may contain)\b", re.IGNORECASE),
+    "absent":   re.compile(r"\b(nem\s+tartalmaz|mentes|free from)\b", re.IGNORECASE),
+}
+
+def _norm(txt: str) -> str:
+    if not txt:
+        return ""
+    txt = unidecode(txt).lower()
+    txt = txt.replace("\r", "\n")
+    txt = re.sub(r"[ \t]+", " ", txt)
+    txt = re.sub(r"\n+", "\n", txt)
+    return txt
+
+def _pick_status(fragment: str) -> str | None:
+    # prioridade: contains > traces > absent
+    if PATTERNS["contains"].search(fragment):
+        return "contains"
+    if PATTERNS["traces"].search(fragment):
+        return "traces"
+    if PATTERNS["absent"].search(fragment):
+        return "absent"
+    return None
+
+def parse_allergens(raw_text: str) -> Dict[str, Dict[str, str | None]]:
+    """
+    Retorna:
+      {
+        "gluten": {"status": "contains|traces|absent|unknown", "evidence": "..."},
+        ...
+      }
+    """
+    text = _norm(raw_text)
+    out: Dict[str, Dict[str, str | None]] = {
+        k: {"status": "unknown", "evidence": None} for k in ALLERGENS
+    }
+
+    # trabalhamos linha a linha e também uma janela deslizante
+    lines = text.split("\n")
+    window = " " + " ".join(lines) + " "
+
+    for key in ALLERGENS:
+        synonyms = [unidecode(s).lower() for s in SYN.get(key, [])]
+
+        status_found = None
+        evidence_found = None
+
+        # 1) por linha
+        for ln in lines:
+            if any(re.search(rf"\b{s}\b", ln) for s in synonyms):
+                st = _pick_status(ln)
+                if st:
+                    status_found = st
+                    evidence_found = ln.strip()
+                    if st == "contains":  # prioridade máxima
+                        break
+
+        # 2) janela curta (±80 chars ao redor)
+        if not status_found:
+            for s in synonyms:
+                for m in re.finditer(rf"\b{s}\b", window):
+                    i = max(0, m.start()-80)
+                    j = min(len(window), m.end()+80)
+                    frag = window[i:j]
+                    st = _pick_status(frag)
+                    if st:
+                        status_found = st
+                        evidence_found = frag.strip()
+                        break
+                if status_found:
+                    break
+
+        out[key]["status"]   = status_found or "unknown"
+        out[key]["evidence"] = evidence_found
+
+    return out

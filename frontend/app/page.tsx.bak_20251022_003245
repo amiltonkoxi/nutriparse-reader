@@ -1,0 +1,230 @@
+"use client";
+
+import Image from "next/image";
+import { useCallback, useMemo, useRef, useState } from "react";
+import ResultCard from "@/components/ResultCard";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+const DEFAULT_MAX = parseInt(process.env.NEXT_PUBLIC_MAX_FILES ?? "2", 10);
+
+type UploadResult = {
+  meta: { source_file: string; extraction_mode: "text" | "ocr"; confidence: number };
+  allergens: Record<
+    string,
+    { status: "contains" | "traces" | "absent" | "unknown"; evidence: string | null }
+  >;
+  nutrition: {
+    energy: { kJ: number | null; kcal: number | null };
+    fat_g: number | null; carbohydrate_g: number | null; sugar_g: number | null;
+    protein_g: number | null; salt_g: number | null; sodium_g: number | null;
+    notes?: string | null;
+  };
+  diagnostics?: { warnings?: string[]; raw_text_preview?: string };
+};
+
+export default function HomePage() {
+  // UI state
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [queue, setQueue] = useState<File[]>([]);
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [hint, setHint] = useState<string>("Drop PDFs here or click Select Files.");
+  const [results, setResults] = useState<UploadResult[]>([]);
+
+  const MAX_FILES = useMemo(() => DEFAULT_MAX, []);
+  const pdfOnly = (files: FileList | File[]) => Array.from(files).filter(f => f.type === "application/pdf");
+  const roomLeft = (add = 0) => Math.max(0, MAX_FILES - (queue.length + add));
+
+  // queue ops
+  const addToQueue = useCallback((incoming: File[]) => {
+    setError(null);
+    if (!incoming.length) return;
+
+    const space = roomLeft();
+    const accepted = incoming.slice(0, space);
+    const rejected = incoming.length - accepted.length;
+
+    if (accepted.length) {
+      setQueue(prev => [...prev, ...accepted]);
+      const left = roomLeft(accepted.length);
+      setHint(left > 0 ? `Added. You can add ${left} more or click Process.` : `Queue full (${MAX_FILES}). Click Process.`);
+    }
+    if (rejected > 0) setError(`Limit of ${MAX_FILES} file(s). Remove some to add more.`);
+  }, [MAX_FILES, queue.length]);
+
+  // dnd
+  const onDragOver = (e: React.DragEvent<HTMLDivElement>) => { e.preventDefault(); setIsDragging(true); };
+  const onDragLeave = () => setIsDragging(false);
+  const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault(); setIsDragging(false);
+    addToQueue(pdfOnly(e.dataTransfer.files || []));
+  };
+
+  // chooser
+  const onChoose = (e: React.ChangeEvent<HTMLInputElement>) => {
+    addToQueue(pdfOnly(e.target.files || []));
+    if (inputRef.current) inputRef.current.value = "";
+  };
+
+  const removeFromQueue = (idx: number) => {
+    setQueue(prev => prev.filter((_, i) => i !== idx));
+    setHint("Removed. Add another file or click Process.");
+    setError(null);
+  };
+
+  const processQueue = async () => {
+    if (!queue.length || processing) return;
+    setProcessing(true); setError(null);
+
+    try {
+      for (const file of queue) {
+        const form = new FormData();
+        form.append("file", file, file.name);
+        const res = await fetch(`${API_BASE}/extract`, { method: "POST", body: form });
+        if (!res.ok) throw new Error(`Failed to process "${file.name}".`);
+        const json: UploadResult = await res.json();
+        setResults(prev => [json, ...prev]);
+      }
+      setQueue([]);
+      setHint("Done! Add more PDFs or review the results below.");
+    } catch (e: any) {
+      setError(e?.message || "Processing error.");
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen">
+      {/* NAVBAR (sticky for quick access) */}
+      <header className="sticky top-0 z-40 border-b bg-white/80 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+          <div className="flex items-center gap-3">
+            <Image src="/favicon.png" alt="NP" width={28} height={28} className="rounded" />
+            <span className="font-semibold tracking-tight">NutriParse Reader</span>
+            <span className="ml-2 rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">v0.2 • Demo</span>
+          </div>
+          <a
+            href="https://github.com/amiltonkoxi/nutriparse-reader"
+            className="rounded-md border px-3 py-1.5 text-sm hover:bg-slate-50"
+            target="_blank" rel="noreferrer"
+          >
+            GitHub
+          </a>
+        </div>
+      </header>
+
+      {/* HERO */}
+      <section className="relative border-b">
+        <div className="hero-surface absolute inset-0 opacity-40" aria-hidden="true" />
+        <div className="relative mx-auto max-w-6xl px-4 py-14 text-center">
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
+            Extract Allergens & Nutrition from PDFs
+          </h1>
+          <p className="mx-auto mt-3 max-w-2xl text-slate-600">
+            Upload up to <span className="font-semibold text-emerald-700">{MAX_FILES} PDF files</span>.
+            Add files first, then click <span className="font-semibold">Process</span>.
+          </p>
+        </div>
+      </section>
+
+      {/* UPLOADER */}
+      <section className="mx-auto max-w-6xl px-4">
+        <div
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDrop={onDrop}
+          className={[
+            "mx-auto mt-8 flex max-w-5xl items-center justify-center rounded-2xl border-2 border-dashed p-10 transition",
+            isDragging ? "border-emerald-500 bg-emerald-50/60" : "border-slate-300 bg-white"
+          ].join(" ")}
+        >
+          <div className="w-full max-w-3xl text-center">
+            <p className="mb-4 text-lg font-medium text-slate-800">{hint}</p>
+            <div className="flex items-center justify-center gap-3">
+              <label
+                htmlFor="file-input"
+                className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-5 py-2.5 text-white shadow hover:bg-emerald-700 disabled:opacity-60"
+              >
+                Select Files
+              </label>
+              <input
+                id="file-input" ref={inputRef} type="file" multiple accept="application/pdf"
+                className="hidden" onChange={onChoose}
+                disabled={processing || queue.length >= MAX_FILES}
+              />
+              <span className="text-sm text-slate-500">PDF only • Max {MAX_FILES} files</span>
+            </div>
+            {error && <p className="mt-3 text-sm text-rose-600">{error}</p>}
+          </div>
+        </div>
+
+        {/* QUEUE */}
+        <div className="mx-auto mb-10 mt-6 max-w-5xl space-y-4">
+          {queue.length > 0 && (
+            <div className="rounded-xl border bg-white/60 p-4 shadow-sm">
+              <div className="mb-3 text-sm font-semibold text-slate-700">
+                Queue ({queue.length}/{MAX_FILES})
+              </div>
+              <ul className="flex flex-wrap gap-2">
+                {queue.map((f, idx) => (
+                  <li key={idx} className="flex items-center gap-2 rounded-full border bg-slate-50 px-3 py-1.5 text-xs shadow-sm">
+                    <span className="max-w-[46ch] truncate">{f.name}</span>
+                    <button
+                      onClick={() => removeFromQueue(idx)}
+                      className="rounded bg-rose-50 px-2 py-0.5 text-rose-600 hover:bg-rose-100"
+                      disabled={processing}
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={processQueue}
+              disabled={processing || queue.length === 0}
+              className="rounded-lg bg-emerald-600 px-4 py-2 text-white shadow hover:bg-emerald-700 disabled:opacity-50"
+            >
+              {processing ? "Processing…" : "Process"}
+            </button>
+            <button
+              onClick={() => setQueue([])}
+              disabled={processing || queue.length === 0}
+              className="rounded-lg border px-4 py-2 text-slate-700 hover:bg-slate-50 disabled:opacity-40"
+            >
+              Clear queue
+            </button>
+            <button
+              onClick={() => setResults([])}
+              disabled={processing || results.length === 0}
+              className="rounded-lg border px-4 py-2 text-slate-700 hover:bg-slate-50 disabled:opacity-40"
+            >
+              Clear results
+            </button>
+            <span className="text-xs text-slate-500">Tip: add up to {MAX_FILES} files, then click Process.</span>
+          </div>
+        </div>
+
+        {/* RESULTS */}
+        {results.length > 0 && (
+          <div className="mx-auto mb-20 max-w-5xl space-y-6">
+            {results.map((r, i) => <ResultCard key={i} data={r as any} />)}
+          </div>
+        )}
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t py-10">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 text-sm text-slate-500">
+          <p>© 2025 NutriParse Reader</p>
+          <a href="https://github.com/amiltonkoxi/nutriparse-reader" className="hover:underline">GitHub</a>
+        </div>
+      </footer>
+    </div>
+  );
+}

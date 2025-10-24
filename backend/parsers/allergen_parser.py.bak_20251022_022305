@@ -1,0 +1,120 @@
+from __future__ import annotations
+import re, json
+from pathlib import Path
+from typing import Dict, List, Tuple, Optional
+from unidecode import unidecode
+
+RULES_PATH = Path(__file__).resolve().parent.parent / "rules" / "allergens.json"
+RULES = json.loads(RULES_PATH.read_text(encoding="utf-8"))
+
+TARGETS = [
+    "gluten","egg","crustaceans","fish","peanut",
+    "soy","milk","tree_nuts","celery","mustard"
+]
+
+ALLERGEN_HDR = re.compile(r"(?is)\b(allergen(?:s)?|allerg[eé]n(?: inform[aá]ci[óo]k)?|alergeny)\b")
+INGREDIENTS_HDR = re.compile(r"(?is)\b(ingredients?|[oö]sszetev[őo]k|skladniki)\b")
+
+def _normalize(txt: str) -> str:
+    return re.sub(r"\s+", " ", unidecode((txt or "")).lower())
+
+def _split_blocks(raw_text: str) -> Tuple[str, str]:
+    """Return (allergen_block, ingredients_block) best-effort."""
+    allergen_block, ingredients_block = "", ""
+    blocks = re.split(r"\n\s*\n", raw_text or "")
+    for b in blocks:
+        head = b.splitlines()[0] if b.splitlines() else ""
+        if ALLERGEN_HDR.search(head):
+            allergen_block += ("\n" + b)
+        if INGREDIENTS_HDR.search(head):
+            ingredients_block += ("\n" + b)
+    return allergen_block.strip(), ingredients_block.strip()
+
+def _evidence_from_original(original: str, needle_regex: str, fallback_tokens: List[str]) -> Optional[str]:
+    """Return ~90 chars around the match in ORIGINAL text (prefer regex, fallback to tokens)."""
+    try:
+        m = re.search(needle_regex, original, flags=re.I)
+        if m:
+            s, e = m.start(), m.end()
+            s = max(0, s - 90); e = min(len(original), e + 90)
+            return original[s:e].strip()
+    except re.error:
+        pass
+    orig_norm = _normalize(original)
+    for tok in fallback_tokens:
+        if not tok: 
+            continue
+        idx = orig_norm.find(tok)
+        if idx >= 0:
+            s = max(0, idx - 90); e = min(len(orig_norm), idx + len(tok) + 90)
+            return original[s:e].strip()
+    return None
+
+def _status_for_block(block_text: str, rules_for_key: Dict[str, List[str]]) -> Tuple[str, Optional[str]]:
+    """Priority: contains > traces > absent."""
+    if not block_text.strip():
+        return "unknown", None
+    block_norm = _normalize(block_text)
+
+    def first_hit(pats: List[str]) -> Optional[Tuple[str, Optional[str]]]:
+        for p in pats or []:
+            try:
+                if re.search(p, block_norm, flags=re.I):
+                    return p, _evidence_from_original(block_text, p, [p])
+            except re.error:
+                continue
+        return None
+
+    hit = first_hit(rules_for_key.get("contains", []))
+    if hit: return "contains", hit[1]
+    hit = first_hit(rules_for_key.get("traces", []))
+    if hit: return "traces", hit[1]
+    hit = first_hit(rules_for_key.get("absent", []))
+    if hit: return "absent", hit[1]
+    return "unknown", None
+
+def parse_allergens(raw_text: str) -> dict:
+    """
+    Section-aware allergen parsing.
+    1) Global overrides (no allergens; direct 'fish' line).
+    2) Prefer the 'Allergens' block; fallback to 'Ingredients' for 'contains'.
+    """
+    original = raw_text or ""
+    norm_all = _normalize(original)
+
+    # --- Global overrides ---
+    globals_rules = RULES.get("_globals", {})
+    # no allergens (HU/PL/EN)
+    for pat in globals_rules.get("no_allergens", []):
+        if re.search(pat, norm_all, flags=re.I):
+            return {k: {"status": "absent", "evidence": "no allergens statement"} for k in TARGETS}
+
+    base: Optional[dict] = None
+    # 'Allergén információ: hal' -> fish contains
+    for pat in globals_rules.get("fish_line", []):
+        if re.search(pat, norm_all, flags=re.I):
+            base = {k: {"status": "unknown", "evidence": None} for k in TARGETS}
+            base["fish"] = {"status": "contains", "evidence": "Allergen info lists fish"}
+            break
+
+    allergens_block, ingredients_block = _split_blocks(original)
+    results: dict = {}
+
+    for key in TARGETS:
+        rules = RULES.get(key, {})
+
+        status, evidence = _status_for_block(allergens_block, rules)
+
+        if status == "unknown" and ingredients_block:
+            contains_only = {"contains": rules.get("contains", [])}
+            s2, e2 = _status_for_block(ingredients_block, contains_only)
+            if s2 == "contains":
+                status, evidence = s2, e2
+
+        results[key] = {"status": status, "evidence": evidence}
+
+    if base:
+        for k, v in base.items():
+            results.setdefault(k, v)
+
+    return results

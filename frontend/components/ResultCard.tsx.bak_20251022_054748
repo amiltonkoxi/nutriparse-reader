@@ -1,0 +1,173 @@
+"use client";
+
+import { ApiResponse, AllergenStatus } from "@/lib/types";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import CopyButton from "./CopyButton";
+import { ScrollArea } from "./ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+
+const STATUS_STYLES: Record<AllergenStatus, string> = {
+  contains: "bg-rose-600 text-white",
+  traces: "bg-amber-500 text-white",
+  absent: "bg-emerald-600 text-white",
+  unknown: "bg-slate-400 text-white",
+};
+const cx = (...c: Array<string | false | undefined>) => c.filter(Boolean).join(" ");
+
+export default function ResultCard({ data }: { data?: ApiResponse | null }) {
+  if (!data) return (<div className="text-sm text-slate-500 p-4 rounded border bg-slate-50">No extraction data yet. Upload a PDF and click <b>Process</b>.</div>);
+  const { meta, allergens, nutrition, diagnostics } = data;
+  const allergenEntries = Object.entries(allergens) as [
+    string,
+    { status: AllergenStatus; evidence: string | null }
+  ][];
+  const fmt = (k: string) => k.replace(/_/g, " ");
+
+  const nutritionTiles = [
+    { label: "Energy", value: `${nutrition.energy?.kJ ?? "—"} kJ` },
+    { label: "Fat", value: `${nutrition.fat_g ?? "—"} g` },
+    { label: "Carbs", value: `${nutrition.carbohydrate_g ?? "—"} g` },
+    { label: "Sugar", value: `${nutrition.sugar_g ?? "—"} g` },
+    { label: "Protein", value: `${nutrition.protein_g ?? "—"} g` },
+    {
+      label: "Salt",
+      value:
+        nutrition.salt_g ??
+        (nutrition.sodium_g ? `${(nutrition.sodium_g * 2.54).toFixed(2)} g` : "—"),
+    },
+  ];
+  const confidencePct = Math.round((meta.confidence ?? 0) * 100);
+
+  return (
+    <Card className="rounded-2xl border bg-white/70 shadow-sm transition hover:shadow-md">
+      <CardHeader className="pb-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle className="text-lg sm:text-xl">Extraction Results</CardTitle>
+            <div className="mt-1 text-xs text-slate-500">
+              <span className="mr-2">File: {meta.source_file}</span>
+              <span className="mr-2 inline-block rounded bg-slate-200 px-2 py-0.5">
+                {meta.extraction_mode === "ocr" ? "OCR mode" : "Text mode"}
+              </span>
+              <span className="inline-block rounded bg-slate-200 px-2 py-0.5">
+                Confidence: {confidencePct}%
+              </span>
+            </div>
+          </div>
+          <CopyButton text={JSON.stringify(data, null, 2)} />
+        </div>
+        <div className="mt-3 h-2 w-full rounded bg-slate-200">
+          <div
+            className={cx(
+              "h-2 rounded bg-emerald-500 transition-all",
+              confidencePct >= 80 && "bg-emerald-600",
+              confidencePct < 50 && "bg-amber-500"
+            )}
+            style={{ width: `${confidencePct}%` }}
+          />
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        <Tabs defaultValue="table" className="w-full">
+          <TabsList>
+            <TabsTrigger value="table">Summary</TabsTrigger>
+            <TabsTrigger value="json">JSON</TabsTrigger>
+            <TabsTrigger value="preview" disabled={!diagnostics?.raw_text_preview}>
+              Preview
+            </TabsTrigger>
+          </TabsList>
+
+          {/* SUMMARY */}
+          <TabsContent value="table" className="pt-4 space-y-8">
+            <section>
+              <h3 className="mb-2 text-sm font-semibold text-slate-700">Allergens</h3>
+              <TooltipProvider>
+                <div className="flex flex-wrap gap-2">
+                  {allergenEntries.map(([key, v]) => (
+                    <Tooltip key={key}>
+                      <TooltipTrigger asChild>
+                        <span
+                          className={cx(
+                            "inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-medium shadow-sm",
+                            STATUS_STYLES[v.status]
+                          )}
+                        >
+                          {fmt(key)}
+                          <span className="rounded bg-black/10 px-1.5 py-0.5 text-[10px]">
+                            {v.status.toUpperCase()}
+                          </span>
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-sm">
+                        <p className="whitespace-pre-wrap text-xs">
+                          {v.evidence || "(no evidence)"}
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ))}
+                </div>
+              </TooltipProvider>
+            </section>
+
+            <section className="space-y-4">
+              <h3 className="text-sm font-semibold text-slate-700">Nutrition (per 100g)</h3>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+                {nutritionTiles.map((n, i) => (
+                  <div key={i} className="rounded-xl border bg-slate-50/70 py-3 text-center shadow-sm">
+                    <p className="text-xs text-slate-500">{n.label}</p>
+                    <p className="text-lg font-semibold text-slate-800">{n.value as any}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <tbody>
+                    <tr className="border-y">
+                      <td className="p-2 text-slate-500">Energy (kcal)</td>
+                      <td className="p-2 font-medium">{nutrition.energy?.kcal ?? "—"} kcal</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              {nutrition.notes && <p className="text-xs text-slate-500">{nutrition.notes}</p>}
+            </section>
+
+            {diagnostics?.warnings?.length ? (
+              <section>
+                <h3 className="mb-2 text-sm font-semibold text-slate-700">Diagnostics</h3>
+                <ul className="ml-5 list-disc space-y-1 text-xs text-amber-700">
+                  {diagnostics.warnings.map((w, i) => <li key={i}>{w}</li>)}
+                </ul>
+              </section>
+            ) : null}
+          </TabsContent>
+
+          {/* JSON */}
+          <TabsContent value="json" className="pt-4">
+            <ScrollArea className="h-80 rounded border bg-slate-50 p-3">
+              <pre className="whitespace-pre-wrap text-xs">{JSON.stringify(data, null, 2)}</pre>
+            </ScrollArea>
+          </TabsContent>
+
+          {/* PREVIEW */}
+          <TabsContent value="preview" className="pt-4">
+            {diagnostics?.raw_text_preview ? (
+              <ScrollArea className="h-80 rounded border bg-slate-50 p-3">
+                <pre className="whitespace-pre-wrap text-xs">{diagnostics.raw_text_preview}</pre>
+              </ScrollArea>
+            ) : (
+              <p className="text-sm text-slate-500">No preview available.</p>
+            )}
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
+  );
+}
+
+/* ------- local helpers ------- */
+function fmtG(v: number | null | undefined) {
+  return typeof v === "number" ? `${v} g` : "—";
+}

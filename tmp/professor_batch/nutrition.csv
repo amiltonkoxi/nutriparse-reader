@@ -1,0 +1,663 @@
+[
+  "file",
+  "mode",
+  "confidence",
+  "kJ",
+  "kcal",
+  "fat_g",
+  "carbohydrate_g",
+  "sugar_g",
+  "protein_g",
+  "salt_g",
+  "sodium_g"
+]
+{
+  "product_name": null,
+  "source_file": "14026 FRISS SERTÉS KARAJ CSN HUN.pdf",
+  "extraction_mode": "text",
+  "serving_basis": "per 100g",
+  "languages": [
+    "en",
+    "hu",
+    "pl"
+  ],
+  "confidence": 0.75
+}
+{}
+{
+  "energy": {
+    "kJ": null,
+    "kcal": null
+  },
+  "fat_g": 6.9,
+  "carbohydrate_g": 0.0,
+  "sugar_g": 0.0,
+  "protein_g": 21.6,
+  "salt_g": null,
+  "sodium_g": null
+}
+{
+  "saturated_fat_g": null,
+  "water_g": null,
+  "collagen_g": null
+}
+{
+  "warnings": [],
+  "pages_scanned": 1,
+  "raw_text_preview": "kiadva: 2025.09.09. termekinformacios lap specifikacio nyilvantartasi szama:\nervenyes: visszavonasig\ngyartja:\narvai husmuhely kft.\nhu\n5500 gyomaendrod, fo ut 81/1.\nean: nem egalizalt 835\nforgalmazza:\nek\nkedvenc kereskedohaz zrt.\n1117 budapest, budafoki ut 209/b.\na termek neve: friss sertes karaj csn\ntomeg: valtozo\ncsomagolas: ledig\nkategoria: friss hus\nalkategoria: serteshus\nlogisztika cca. 15 kg/m10#\ntermek meghatarozasa:\nfriss sertes csontozasabol szarmazo vazizomzat csont nelkul\nosszetetel:\n-\nerzekszervi jellemzok:\nkulalak: friss husra jellemzo szin, feluleten hartya talalhato\nallomany, szerkezet,\npuha, jol osszeallo.\nmetszeslap:\nszin, iz, illat: friss husra jellemzo szin illat.\nkulalak vizualis megjelenitese:\n2/1 oldal\nkiadva: 2025.09.09. termekinformacios lap specifikacio nyilvantartasi szama:\nervenyes: visszavonasig\ngyartja:\narvai husmuhely kft.\nhu\n5500 gyomaendrod, fo ut 81/1.\nean: nem egalizalt 835\nforgalmazza:\nek\nkedvenc kereskedohaz zrt.\n1117 budapest, budafoki ut 209/b.\nfizikai es kemiai jellemzok:\nmutato: egyseg: limit:\nsotartalom m/m %\nviz tartalom -\nzsirtartalom -\nfeherjetartalom -\nmikrobiologiai kovetelmenyek:\n2073/2005/ek es 4/1998.(xi.11) eum rendelet szerint.\nszavatossagi ido: tarolasi feltetelek:\n5 nap (+)4 c fok alatti homersekleten\ntermek megbontasa utani szav. ido: szallitasi korulmenyek:\nledig (+)4 c fok alatti homersekleten\nalergen es egyeb informaciok: atlagos tapertektartalom 100g termekben\nallergen anyagokat nem tartalmaz. energia 155 kcal\ngmo mentes. sugarkezelt osszetevot nem tartalmaz.\naz elelmiszer es annak jelolese, valamint csomagoloanyaga\nzsir 6.9\nmegfelel a magyar es az eu-s jogszabalyi eloirasoknak.\naz elelmiszer eloallitasaert es a dokumentum tartalmaert\nfelelos szemely: arvai karoly ugyvezeto amelybol telitett zsirsav 2.5\nosszes szenhidrat 0\namelybol cukor 0\nfeherje 21.6\nso -\n2/2 oldal"
+}
+[
+  "14026 FRISS SERTÉS KARAJ CSN HUN.pdf",
+  "text",
+  0.75,
+  null,
+  null,
+  6.9,
+  0.0,
+  0.0,
+  21.6,
+  null,
+  null
+]
+[
+  "file",
+  "mode",
+  "confidence",
+  "kJ",
+  "kcal",
+  "fat_g",
+  "carbohydrate_g",
+  "sugar_g",
+  "protein_g",
+  "salt_g",
+  "sodium_g"
+]
+{
+  "product_name": null,
+  "source_file": "16011 FRISS CSIRKE MELLFILÉ VCS  IMP - ANIMEX.pdf",
+  "extraction_mode": "text",
+  "serving_basis": "per 100g",
+  "languages": [
+    "en",
+    "hu",
+    "pl"
+  ],
+  "confidence": 0.75
+}
+{}
+{
+  "energy": {
+    "kJ": null,
+    "kcal": null
+  },
+  "fat_g": null,
+  "carbohydrate_g": null,
+  "sugar_g": null,
+  "protein_g": null,
+  "salt_g": null,
+  "sodium_g": null
+}
+{
+  "saturated_fat_g": null,
+  "water_g": null,
+  "collagen_g": null
+}
+{
+  "warnings": [],
+  "pages_scanned": 7,
+  "raw_text_preview": "kod dokumentu: anx-p13-i1-z5, wydanie 2., obowiazuje od: 01.12.2015, zastepuje: anx-p13-i1-z5, wydanie 1. z 27.04.2015\nanimex foods sp. z o. o. oddzial k3 w daszynie, koryta 10, 99-107 daszyna\nkarta produktu (ktp) / product specifications (ktp)\nnazwa produktu / product name: filet z poledwiczka / chicken breast fillet with\ninner\nwydanie nr / issue no. 1210-43/03/25 anuluje wydanie nr / cancels edition no. 1210-43/02/24 obowiazuje od / effective date: 03.02.2025\nstanowisko / occupation imie i nazwisko / data / date podpis / signature\nposition name and surname\nopracowal / technolog / technologist jolanta polit\ndeveloped\nsprawdzil / glowny technolog / chief katarzyna kobus\nchecked technologist\nzatwierdzil / dyrektor produkcji / director of ewa liszewska\napproved production\nindeks / index 4021668 12100024 kk fil.ok1.5kgvac 8sttk\n4021863 12100026 kk fil.2.5kgvac 4stkt hal\n4021538 12100022 kk fil.2.5kgvac 4stkt\n4021839 12100025 kk fil.ok2.5kgvac 2sttk\n4021578 12100023 kk fil.ok2.5kgvac 4stkt hal\n4021021 12100020 kk fil.ok2.5kgvac 4stkt\n4020921 12100092 kk fil.2.5kgvac 20kgpj ex\n4026899 12110028 kk fil.max5kgvac 3stpj\n4024863 12110022 kk fil.ok5kgvac 2sttk\n4020959 12100093 kk fil.ok5kgvac 2stkt\n4020969 12101091 kk fil.5kgvac 2stkt\nopis / description zasadniczy element tuszki kurczecej, patroszonej - filet kurczecy klasa a. swiezy.\nan essential element of chicken carcasses - breast fillet grate a. fresh.\nprzeznaczenie dla wszystkich grup, za wyjatkiem dzieci ponizej 1 roku zycia.\nkonsumenckie / przeznaczony do spozycia po obrobce cieplnej.\npurpose of all consumer groups with the exception of children under 1.\nconsumer for consumption after cooking.\nwyglad / cechy zasadniczy element tuszki kurczecej, patroszonej - filet kurczecy klasa a.\norganoleptyczne polowa piersi bez kosci, tj. bez mostka i zeber. miesien piersiowy wraz z miesniem\n/ description / glebokim bez przylegajacej skory. tkanka miesniowa pelna, piers dobrze rozwinieta,\norganoleptic szeroka, dluga i umiesniona. n"
+}
+[
+  "16011 FRISS CSIRKE MELLFILÉ VCS  IMP - ANIMEX.pdf",
+  "text",
+  0.75,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null
+]
+[
+  "file",
+  "mode",
+  "confidence",
+  "kJ",
+  "kcal",
+  "fat_g",
+  "carbohydrate_g",
+  "sugar_g",
+  "protein_g",
+  "salt_g",
+  "sodium_g"
+]
+{
+  "product_name": null,
+  "source_file": "22026 Kukta Gyorsfagyasztott panírozott csirkeszárny termékspecifikáció_aláírva.pdf",
+  "extraction_mode": "text",
+  "serving_basis": "unknown",
+  "languages": [
+    "en",
+    "hu",
+    "pl"
+  ],
+  "confidence": 0.75
+}
+{}
+{
+  "energy": {
+    "kJ": 282.0,
+    "kcal": null
+  },
+  "fat_g": 18.9,
+  "carbohydrate_g": 8.7,
+  "sugar_g": null,
+  "protein_g": 15.0,
+  "salt_g": 2.3,
+  "sodium_g": null
+}
+{
+  "saturated_fat_g": null,
+  "water_g": null,
+  "collagen_g": null
+}
+{
+  "warnings": [],
+  "pages_scanned": 4,
+  "raw_text_preview": "product specification/termekspecifikacio\nkukta gyorsfagyasztott panirozott csirkeszarny\n1. version/1. verzio: release date/kiadas: specification nr./ azonosito:\n28.05.2025 28.05.2025 bukpcs-1\nproduct description/ termek leiras:\npacolt, panirozott keszre sutott csirkeszarny, gyorsfagyasztott.\nproduction method / gyartasi modszer\na teljes gyartasi folyamat a mindenkori eu es magyar jogszabalyoknak megfeleloen tortenik.\nforgalmazza: mirbesz kft. h-2051 biatorbagy tormasret utca 1.\nthe slaughterhouse is certified: /gyartouzem tanusitvanyok:\n- brcgs\n- ifs (international food standard)\n- halal\nquality specification / minoseg specifikacio\ngyarto uzem: hu215ek\ningredient list including quid declaration/ osszetevolista:\ncsirkeszarny 82%, buzaliszt, napraforgo olaj, ivoviz, etkezesi so, stabilizaloszer (e450, e451), cukor,\nhagyma, fokhagyma, aroma (termeszetes aroma, izvilaga hus), fuszerkivonat (feketebors, chili), fuszerek\n(voroshagyma, fokhagyma, chili, feketebors, kakukkfu)\na termek tartalmazhat tejet, zellert es szojat.\nalapanyag szarmazasa:\ncsirke:\n- szuletes helye: magyarorszag\n- neveles helye: magyarorszag, szlovakia, romania\nvagas helye:magyarorszag\nsuitability data/ alkalmassagi adatok:\nalkalmassagi adatok: igen nem reszletek\nalkalmas vegetarianusoknak? nem\nalkamas veganoknak? nem\nalkamas liszterzekenyeknek? nem\ngm origin labelling required? gm eredet cimkezes kotelezo? nem\nanimal welfare certified? allatjoleti tanusitvany? nem\norganoleptic/ megjelenes\n- colour: golden brown exterior / aranybarna szinu\n- flavour: specific to chicken, no off flavours /csirkehusra jellemzo, idegen iztol mentes\n- texture: specific to chicken / csirkehusra jellemzo\n- odour: specific to chicken, no off odours / csirkehusra jellemzo, idegen szagtol mentes\n1 / 3\nproduct specification/termekspecifikacio\nkukta gyorsfagyasztott panirozott csirkeszarny\n1. version/1. verzio: release date/kiadas: specification nr./ azonosito:\n28.05.2025 28.05.2025 bukpcs-1\nmicrobiological standards:\nmicroorganis"
+}
+[
+  "22026 Kukta Gyorsfagyasztott panírozott csirkeszárny termékspecifikáció_aláírva.pdf",
+  "text",
+  0.75,
+  282.0,
+  null,
+  18.9,
+  8.7,
+  null,
+  15.0,
+  2.3,
+  null
+]
+[
+  "file",
+  "mode",
+  "confidence",
+  "kJ",
+  "kcal",
+  "fat_g",
+  "carbohydrate_g",
+  "sugar_g",
+  "protein_g",
+  "salt_g",
+  "sodium_g"
+]
+{
+  "product_name": null,
+  "source_file": "24476_HEKK FILÉ BN 1000_800G 20_ G 1KG_10KG_#.pdf",
+  "extraction_mode": "text",
+  "serving_basis": "unknown",
+  "languages": [
+    "hu",
+    "pl"
+  ],
+  "confidence": 0.75
+}
+{}
+{
+  "energy": {
+    "kJ": null,
+    "kcal": null
+  },
+  "fat_g": null,
+  "carbohydrate_g": null,
+  "sugar_g": null,
+  "protein_g": null,
+  "salt_g": null,
+  "sodium_g": null
+}
+{
+  "saturated_fat_g": null,
+  "water_g": null,
+  "collagen_g": null
+}
+{
+  "warnings": [],
+  "pages_scanned": 4,
+  "raw_text_preview": "termekszam: gyartmanylap 1/5\nh/15.1 hekk file porcio 10% glazur\ngyartmanylap\ntermekszam: h/15.1\nervenyesseg kezdete: 2023.09.01.\nervenyesseg vege: visszavonasig\ni. az elelmiszer-eloallitas fobb adatai:\ni./1. az elelmiszer eloallito neve, cime:\nhalker kft 8630 balatonboglar, klapka u. 14.\ntel.:85/550-900 fax: 85/550-901\ni./2. az elelmiszer eloallito hely neve es cime:\nhalker kft 8630 balatonboglar, klapka u. 14.\ntel.:85/550-900 fax: 85/550-901\nii. az elelmiszer leirasa\nii./1. az elelmiszer megnevezese:\ngyorsfagyasztott\nhekk file porcio bor nelkul 10% glazur\n(merluccius hubbsi)\nii./2. az elelmiszer alkotoreszeinek csokkeno mennyisegi sorrendben torteno felsorolasa:\nhalfile (hekk), ivoviz (jegreteg)\nii./3. alkalmazott technologiai segedanyag:\nnem tartalmaz.\nii./4. az eloallitasi eljaras lenyeges, a kesztermek biztonsaga, minosege szempontjabol\nmeghatarozo lepeseinek es parametereinek rovid leirasa:\na hutohaztol a csomagolando aru tombosre fagyasztva, interfoliasan, kartonban\nerkezik. a csomagolas elotti napon a hutott eloterben a kartonokat eltavolitjuk, a\nfile interfoliasan kerul a csomagoloba. a tomboket toro geppel megtorik, a folia\neltavolitasra utan a file muanyag rekeszbe kerul. glazurozas eseten a gyorsfagyasztott halfilet nehany masodpercre jeges vizbe meritjuk, igy a feluleten vekony\njegreteg kepzodik. a masnapi csomagolasig a hutobe kerul.\nerkezhet a hutohaztol ledig csomagolasban is. errol a kartont a hutott eloterben eltavolitjuk es ledig zsakkal muanyag rekeszekbe atrakjuk, igy kerul be a csomagoloba kozvetlen csomagolasra.\na csomagolasa kisfogyasztok reszere elore kiegeszito cimkevel ellatott polietilen\ntasakba vagy nagyfogyasztok reszere polietilen ledig zsakba tortenik. a polietilen\ntasakot a kivant mennyiseg kimerese utan kezi hegesztovel lezarjuk. 1000 g-nal\nkisebb kiszereles eseten a kotelezo jelolesek kiegeszito cimken kerulnek a tasakra.\nnagyfogyasztoi kiszerelesnel ledig zsakba kimerjuk a kivant mennyiseget, majd a\ntermekszam: gyartmanylap 2/5\nh/1"
+}
+[
+  "24476_HEKK FILÉ BN 1000_800G 20_ G 1KG_10KG_#.pdf",
+  "text",
+  0.75,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null
+]
+[
+  "file",
+  "mode",
+  "confidence",
+  "kJ",
+  "kcal",
+  "fat_g",
+  "carbohydrate_g",
+  "sugar_g",
+  "protein_g",
+  "salt_g",
+  "sodium_g"
+]
+{
+  "product_name": null,
+  "source_file": "31255 KEDVENC ÍZEK FORRÓN FÜSTÖLT KÖTÖZÖTT COMB SONKA KB 1KG VCS (1).pdf",
+  "extraction_mode": "text",
+  "serving_basis": "per 100g",
+  "languages": [
+    "hu",
+    "pl"
+  ],
+  "confidence": 0.75
+}
+{}
+{
+  "energy": {
+    "kJ": 1553.0,
+    "kcal": null
+  },
+  "fat_g": null,
+  "carbohydrate_g": null,
+  "sugar_g": null,
+  "protein_g": null,
+  "salt_g": 2.0,
+  "sodium_g": null
+}
+{
+  "saturated_fat_g": null,
+  "water_g": null,
+  "collagen_g": null
+}
+{
+  "warnings": [],
+  "pages_scanned": 2,
+  "raw_text_preview": "termekinformacios adatlap eredeti specifikacio kiadasi datuma: 2023.07.20.\nkedvenc izek utolso modositas datuma:\nforgalmazo adatai:\nmirbesz kereskedelmi kft.\nh-2051 biatorbagy tormasret u. 1. ean:\ntelefon: +36 23 312-468\nkedvencizek@mirbest.hu\ntermek megnevezese leiro nevvel,\ngyartoi uzemszammal kedvenc izek sefvalogatas sutopapiros fustolt, szeletelt bacon e 1000g vg.\nelelmiszerkonyvi fokategoria: huskeszitmeny\nelelmiszerkonyvi alkategoria: ------\nsertes bacon 96%, savanyusagot szabalyozo anyag: e 325; so, cukor, stabilizator: e 451; antioxidans: e 316;\ntermekosszetetel (mennyisegileg csokkeno\nsorrendben): tartositoszer: e 250.\nnetto tomeg (e/cca. (grammban megadva)): 1380g\ncsomagolas (ledig/mubeles/vg./vcs./\nvodor/pohar/zacsko/celofan): folia\nlogisztika (db/#;#/rlp.) 1.38kg/db; 8 db/szint; 7 szint\ntermekhossz\nnem egalizalt\ncsomagolas tartalma: tomeg (mm); termekatmero (mm);\ncsomagolt termek eseten: csomag tomege\ndb v.szelet/csomag g/(db v. szelet) szeletatmero szeletvastagsag (mm)\n(g)\n(mm)\n1380 60 23-+2g 250+-10% 1.80(min1.65-max2.5)\na termek megfelel a magyar elelmiszerkonyv huskeszitmenyekrol rendelkezo 1-3/13-1 szamu eloirasanak \"a\" reszeben foglaltaknak.\nnem valasz eseten kitoltendo parameterek: fizikai, kemiai jellemzok es erzekszervi tulajdonsagok.\nigen nem\nfizikai, kemiai jellemzok\n(lsd. 3.sz. munkalapon meghatarozva)\naz elelmiszerben levo adalekanyagokrol szolo 1152/2013/eu rendelettel osszhangban.\nerzekszervi jellemzok:\nkulalak: sertesszalonnabol nyert fustolt hus, bor nelkul, borda nelkul, teglalap alakhoz hasonlo; fustolessel tartositott.\nallomany, szerkezet, metszeslap: meglehetosen puha, rugalmas, a szoveteknek tomornek kell lenniuk. alkalmankenti zselekivalas elfogadhato. a szeleteknek\nszin, iz, illat: feluleti szin: hus: barnatol a vilagos barnaig; zsir: aranytol a vilagos barnaig. romlastol mentes, iz es illat a fustolt baconra\natlagos tapertek 100g-ra allergen informaciok a 1169/2011/ek rendelet ii. melleklete szerint osszetevo\nenergia [kj] 1553 i"
+}
+[
+  "31255 KEDVENC ÍZEK FORRÓN FÜSTÖLT KÖTÖZÖTT COMB SONKA KB 1KG VCS (1).pdf",
+  "text",
+  0.75,
+  1553.0,
+  null,
+  null,
+  null,
+  null,
+  null,
+  2.0,
+  null
+]
+[
+  "file",
+  "mode",
+  "confidence",
+  "kJ",
+  "kcal",
+  "fat_g",
+  "carbohydrate_g",
+  "sugar_g",
+  "protein_g",
+  "salt_g",
+  "sodium_g"
+]
+{
+  "product_name": null,
+  "source_file": "32007 GYULAI KOLBÁSZ KB 2,5KG VG.pdf",
+  "extraction_mode": "ocr",
+  "serving_basis": "per 100g",
+  "languages": [
+    "hu",
+    "pl"
+  ],
+  "confidence": 0.65
+}
+{}
+{
+  "energy": {
+    "kJ": 479.0,
+    "kcal": 43.002
+  },
+  "fat_g": 43.002,
+  "carbohydrate_g": 1.0,
+  "sugar_g": null,
+  "protein_g": 22.0,
+  "salt_g": 3.6,
+  "sodium_g": null
+}
+{
+  "saturated_fat_g": null,
+  "water_g": null,
+  "collagen_g": null
+}
+{
+  "warnings": [],
+  "pages_scanned": 1,
+  "raw_text_preview": "gyulahus kft.\ntermeklap ek\n1./ termek neve: gyulai kolbasz paros- ofj\nszaritasos erlelessel keszult kolbasz- vedogazos gyujtocsomagolasban\n2./ gyartasi engedely: gyulahus kft. gyartmanylap\n3./ minosegbiztositas: brc, haccp\n4./ termekcsoport: szaritasos erlelessel keszult kolbaszok\n5./ gyarto vallalat: gyulahus kft. 5700 gyula, beke sgt. 50.\n6./ osszetevok: serteshus, gyartasi szalonna, etkezesi so, burkoloanyag (sertes\nvekonybel), paprika-oorlemeny, fuszerek, antioxidansok\n/e300, e330/, szacharoz, tartositoszer /e250/\n100 g kesztermek 162 g serteshus felhasznalasaval keszult.\n7./ burkoloanyag: sertes vekonybel\n8./ kemiai tulajdonsagok:\naz alabbi kemiai es erzekszervi parameterek teljesulese biztositja az ofj\ntermekre vonatkozo termekleirasban foglaltaknak valo megfelelest.\nviz-feherje hanyados legfeljebb 1.5\nzsir-feherje hanyados legfeljebb 2.7\nkotoszovetmentes feherjetartalom legalabb 15.0%\na vizaktivitas erteke legfeljebb 0.91\nnatrium-klorid tartalom legfeljebb 5.0%\n9./ erzekszervi tulajdonsagok:\nalak, meret: 26-32 mm atmeroju, 200-220 mm hosszusagu parozott termek.\nburkolata: tiszta serulestol mentes, nem peneszes, kisse gobos, dudoros feluletu.\nallomany, metszeslap: tomor, rugalmas jol osszeallo, jol szeletelheto.\na metszeslapon huspepbe agyazott 4-6 mm nagysagu hus es szalonna szemcsek\nlathatoak egyenletes elosztasban.\nszin, illat, iz: a burkolat vorosesbarna szinu, attetszenek a szalonnaszemcsek.\nkellemesen fustolt, fuszeres illatu, izet, aromajat a felhasznalt fuszerek harmoniaja adja.\n10./ az elelmiszer atlagos taperteke 100g termekben:\nenergia 1982 kj /479 kcal\nzsir 43.002\namelybol telitett zsirsavak 18.002\nszenhidrat 1.00g\namelybol cukrok 0.60g\nfeherje 22.00g\nso 3.60g\n1 1./ kiszereles nagysaga: cca. 2500g\n12./ tarolasi es szallitasi homerseklet: +10- +20 degc kozott\n13./ szallitas: hitekocsiban\n14./ minoseget megorzi: 60 nap\n15./ havi eloallithato mennyiseg: megrendelcstol fuggoen\n16./ atfutasi ido: 30 nap\n17./ szarmazasi orszag: magyarorszag\n18./a hus sza"
+}
+[
+  "32007 GYULAI KOLBÁSZ KB 2,5KG VG.pdf",
+  "ocr",
+  0.65,
+  479.0,
+  43.002,
+  43.002,
+  1.0,
+  null,
+  22.0,
+  3.6,
+  null
+]
+[
+  "file",
+  "mode",
+  "confidence",
+  "kJ",
+  "kcal",
+  "fat_g",
+  "carbohydrate_g",
+  "sugar_g",
+  "protein_g",
+  "salt_g",
+  "sodium_g"
+]
+{
+  "product_name": null,
+  "source_file": "50037 - UNIVER ÉDES ANNA 200 GR6DB#.pdf",
+  "extraction_mode": "ocr",
+  "serving_basis": "per 100g",
+  "languages": [
+    "en",
+    "hu",
+    "pl"
+  ],
+  "confidence": 0.65
+}
+{}
+{
+  "energy": {
+    "kJ": 53.0,
+    "kcal": null
+  },
+  "fat_g": 0.9,
+  "carbohydrate_g": 41.0,
+  "sugar_g": 3.7,
+  "protein_g": 6.9,
+  "salt_g": 11.5,
+  "sodium_g": null
+}
+{
+  "saturated_fat_g": null,
+  "water_g": null,
+  "collagen_g": null
+}
+{
+  "warnings": [],
+  "pages_scanned": 5,
+  "raw_text_preview": "univer product zrt. vevoi termekspecifikacio/\n6000 kecskemet, szolnoki ut 35./\nh-6000 kecskemet, szolnoki ut .35. product specification\ndokumentum temek/\nkodja/ code 40.. product: , edes anna\"/\"sweet ann\"\nof document: nyers daralt papika edes/raw\ncrushed paprika mild\n1. termekleiras/ descripton of the product\nnyers daralt fuszer es pritaminpaprika kevereke soval es tartositoszerrel./ mix of raw crushed spice and\nred bell paprika with salt and preservative.\nszarmazasi orszag: magyarorszag/ origin: hungary\n2. osszetetel/ ingredients\nnyers pritamin- es fuszerpaprika daralmany (87%), etkezesi so, siiritoanyag (xantan gumi), etkezesi\nsav (citromsav), tartositoszer (kalium-szorbat)./\nraw crushed red bell pritamin-and spicepaprika (87%), salt, thickener (xanthan gum), acid (citric\nacid), preservative (potassium-sorbate).\n3. erzekszervi kovetelmenyek/ sensible qualities\nszin/color: elenkpiros, sargas szinu paprikamagokkal tarkitva./vivid red, interspersed with yellow pepper seeds.\nihat/scent; az erett csemege fiiszerpaprikara jellemzo friss, tide illatu./ typical ripe mild spice paprika, fresh scent.\n{z/taste: fiiszerpaprikara jellemzo friss, tide, sos iz./typical spice paprika, fresh, salty taste.\nallomany/subtance: darabosra orolt allomanyu./ crushed subtance.\n4. kemiai kovetelmenyek/ chemical requirements\nadalekanyagok az 1333/2008/ek rendelet szerint, ii. melleklet, 12.2.2. kategoria/\nadditives according to the 1333/2008/ec, annex ii., 12.2.2. category\nparameter/mertekegyseg minimum maximum.\nparameter/unit of measurement\nsotartalom/ salt content (% m/m) 13.50\n85 |\nszorbinsav/ sorbic acid (mg/kg) | 1000\n5, nehezfem-tartalom hatarertekei/ heavy metal limit values\n\"a bizottsag 1881/2006/ek rendelete esa 49/2014: (tv:29:)7vm-rendelet-szerint:/--------------------\naccording to the commission regulation no. 1881/2006 and and the 49/2014, (iv.29.) vm decree.\nkeszitette/made by: ervenyesseg kezdetefr -- me 26.04.2023\nvalid from: univer product zrt. :\noldal/ page: | kirtatasfejl"
+}
+[
+  "50037 - UNIVER ÉDES ANNA 200 GR6DB#.pdf",
+  "ocr",
+  0.65,
+  53.0,
+  null,
+  0.9,
+  41.0,
+  3.7,
+  6.9,
+  11.5,
+  null
+]
+[
+  "file",
+  "mode",
+  "confidence",
+  "kJ",
+  "kcal",
+  "fat_g",
+  "carbohydrate_g",
+  "sugar_g",
+  "protein_g",
+  "salt_g",
+  "sodium_g"
+]
+{
+  "product_name": null,
+  "source_file": "50180 - CIGÁNDI CÉRNAMETÉLT 4TOJ 5KG.pdf",
+  "extraction_mode": "ocr",
+  "serving_basis": "unknown",
+  "languages": [
+    "hu",
+    "pl"
+  ],
+  "confidence": 0.65
+}
+{}
+{
+  "energy": {
+    "kJ": null,
+    "kcal": null
+  },
+  "fat_g": null,
+  "carbohydrate_g": null,
+  "sugar_g": null,
+  "protein_g": 12.7,
+  "salt_g": null,
+  "sodium_g": null
+}
+{
+  "saturated_fat_g": null,
+  "water_g": null,
+  "collagen_g": null
+}
+{
+  "warnings": [],
+  "pages_scanned": 4,
+  "raw_text_preview": "cigandi teszta kft.\n3973 cigand, fo u. 47.\ntelefon: (+36) 47/334-554\nwww.ciganditeszta.hu\ntermekspecifikacio\nervenyesseg kezdete: 2021. junius 01.\nervenyesseg vege: visszavonasig\ni. elelmiszer eloallito adatai:\n1. a vallalkozas neve, szekhelyenek cime:\ncigandi teszta kft.\n3973 cigand, fo u. 47.\n2. az eloallito hely(ek) neve, cime:\nszaraztesztauzem\n3973 cigand, fo u. 47.\nii. az elelmiszer leirasa\n1. megnevezes\n4 tojasos szarazteszta\ngyartott formatumok: kiskocka, abc betuteszta, eperlevel, zabkocka, reszelt\ntarhonya, gepi tarhonya, kiskagylo, kiskarika-csillag, eperszalag, gepi csiga,\nsodort csiga, cigandi csiga, cernametelt, lebbencs, csusza, spagetti, szarvacska\nkicsi, szarvacska (nagy), copfocska, orso, nagykagylo, rovidcso, nagykocka,\nfodros kocka, szelesmetelt, penne, olaszcsavart, fodros hosszumetclt.\na termek fogyasztasa azon szemelyeknek ajanlott, akik nem szenvednek gluten\nerzekenysegben es nem allergiasok a tyuktojasra.\n2. a termek csomagolasa\negyedi fogyasztoi csomagolas modja /anyaga, zaras, cimke elhelyezese/:\ntomeg: 200 g, 250 g, 500 g, 1 kg, 5 kg, 10 kg\negyedi fogyasztoi csomagolas modja:\n- . feliratozott, kasirozott bopp tasak, negy oldalon hegesztessel lezarva\n- feliratozott, kasirozott bopp sikfolia also, felso oldalon es hatul kozepen\nhegesztessel lezarva\ngyujtocsomagolas:\n- pe zsak, zsakon elhelyezett cimkevel jelolve\n- 3 retegu kartondoboz, dobozon elhelyezett cimkevel jelolve\noldal 1 /5\ncigandi teszta kft.\n3973 cigand, fe u. 47.\ntelefon: (+36) 47/334-554\nwww.ciganditeszta.hu\negyedi nagyfogyasztoi csomagolas modja:\n- elenyomott, feliratozott pe zsak, ket vegen hegesztessel lezarva.\n- 3 retegu kartondoboz, dobozon elhelyezett cimkevel jelolve. (csuszatcszta)\na termek csomagolasa:\nelsodleges anyagok 5 kg termek: elonyomott, feliratozott pe zsak,\nelsodleges anyagok 4 kg termek: natur pe zsak, 3 retegu kartondoboz\nmasodlagos anyagok: cimke, ragasztoszalag\nharmadlagos anyagok: raklap, sztreccsfolia\na csomagoloanyagok megfelelnek az 1935/04/ek (2004. o"
+}
+[
+  "50180 - CIGÁNDI CÉRNAMETÉLT 4TOJ 5KG.pdf",
+  "ocr",
+  0.65,
+  null,
+  null,
+  null,
+  null,
+  null,
+  12.7,
+  null,
+  null
+]
+[
+  "file",
+  "mode",
+  "confidence",
+  "kJ",
+  "kcal",
+  "fat_g",
+  "carbohydrate_g",
+  "sugar_g",
+  "protein_g",
+  "salt_g",
+  "sodium_g"
+]
+{
+  "product_name": null,
+  "source_file": "60055 MEDVE KÖRDOBOZOS SAJT SONKÁS 6 CIKKES 200G.pdf",
+  "extraction_mode": "text",
+  "serving_basis": "per 100g",
+  "languages": [
+    "hu",
+    "pl"
+  ],
+  "confidence": 0.75
+}
+{}
+{
+  "energy": {
+    "kJ": 186.0,
+    "kcal": 257.0
+  },
+  "fat_g": 14.0,
+  "carbohydrate_g": 5.6,
+  "sugar_g": null,
+  "protein_g": 8.8,
+  "salt_g": 2.0,
+  "sodium_g": null
+}
+{
+  "saturated_fat_g": null,
+  "water_g": null,
+  "collagen_g": null
+}
+{
+  "warnings": [],
+  "pages_scanned": 3,
+  "raw_text_preview": "kesztermek\nc2\n2sp - 004-03\nspecifikacio\nmedve orias sonkas\nkiadas: 04 kiadas datuma: 2024.02.05. ervenyesseg: visszavonasig\naz elelmiszer eloallito:\n1. a vallalkozo neve, szekhelyenek cime:\na savencia fromage & dairy hungary zrt.\n8200 veszprem, kisto u. 9.\n2. az elelmiszer-eloallito hely neve, cime:\na savencia fromage & dairy hungary zrt.\nrepcelaki uzeme: 9653 repcelak, vorosmarty u.1\nregisztracios szam: hu 265 ek\n3. megnevezes:\nmedve orias sonkas kenheto, felzsiros omlesztett sajt 200g/ 6 adag\n4. osszetevok felsorolasa:\nivoviz, sajt, vaj, sonka 5% [bor es csontnelkuli sertes zsiros lapockahus (86%), ivoviz, etkezesi so, stabilizatorok\n(e451, e452), dextroz, surito anyag (e407a), antioxidans (e316), tartositoszer (e250)], tejsavopor, sovany tejpor,\ntejfeherje, emulgealosok (e452, e339), modositott kukoricakemenyito (e1422), stabilizator (karragen),\nsavanyusagot szabalyozo anyag (citromsav), etkezesi so, aroma.\nallergen informacio: a termek tejet (tejfeherjet, laktozt) tartalmaz.\n5. a termek csomagolasa:\ncikkelyenkent aluminium foliaba, papir adagcimkevel es a nyitashoz szukseges pvdc teposzalaggal ellatva. a\ncikkelyek csomagolasa papirdobozba, amely a minosegmegorzes datumat tartalmazza. a dobozok zarasa ontapados\nzaro szalaggal, majd kartonozas, raklapozas. a 10/2011 ek rendeletnek es az me-1-2-82/711 eloirasnak megfelel.\ndoboz karton raklapozas\nnetto tomeg: ean -kod: netto tomeg: brutto tomeg: ean -kod: elrendezes: netto tomeg: brutto tomeg:\n200 g 5997684502126 20*200g=4.0 kg 4.5 kg 15997684502321 15 db* 10 sor 600 kg 699 kg\n6. mikrobiologiai jellemzok:\n2073/ 2005/ ek rendelet szerint:\nmikroorganizmus celertek elfogadhatosag hatara\nlisteria monocytogenes 0/ 25 g 0/ 25 g\nstaphylococcusok altal termelt enterotoxinok 0/ 25 g 0/ 25 g\n1/ 4\nkesztermek\nc2\n2sp - 004-03\nspecifikacio\nmedve orias sonkas\nkiadas: 04 kiadas datuma: 2024.02.05. ervenyesseg: visszavonasig\n7. vegyi szennyezettseg:\na 1881 -2006 ek rendeletnek megfelel.\naz elelmiszer minosegi jellemzoi:\n8. osszetete"
+}
+[
+  "60055 MEDVE KÖRDOBOZOS SAJT SONKÁS 6 CIKKES 200G.pdf",
+  "text",
+  0.75,
+  186.0,
+  257.0,
+  14.0,
+  5.6,
+  null,
+  8.8,
+  2.0,
+  null
+]
+[
+  "file",
+  "mode",
+  "confidence",
+  "kJ",
+  "kcal",
+  "fat_g",
+  "carbohydrate_g",
+  "sugar_g",
+  "protein_g",
+  "salt_g",
+  "sodium_g"
+]
+{
+  "product_name": null,
+  "source_file": "60118 NÁDUDVARI JOGHURT NATÚR 3_ 900G.pdf",
+  "extraction_mode": "ocr",
+  "serving_basis": "per 100g",
+  "languages": [
+    "hu",
+    "pl"
+  ],
+  "confidence": 0.65
+}
+{}
+{
+  "energy": {
+    "kJ": 223.0,
+    "kcal": 53.0
+  },
+  "fat_g": null,
+  "carbohydrate_g": 2.8,
+  "sugar_g": null,
+  "protein_g": 3.2,
+  "salt_g": 0.1,
+  "sodium_g": null
+}
+{
+  "saturated_fat_g": null,
+  "water_g": null,
+  "collagen_g": null
+}
+{
+  "warnings": [],
+  "pages_scanned": 4,
+  "raw_text_preview": "dokumentum |haccp\ntema: elemzes\ndokumentum\nhaccp-1.1.1\ndokumentum | termeknev: specifikacio\nseme. t 1. == kod:\n1/5\nnadudvari elelmiszer kft.\ntejiizeme\n\"eh pun oa een | oldal:\nnadudan |. verzio (datum):\n1(2021.06.21.)\n[d ta 4\nnadudvari elelmiszer kft.\n1. szallito adatai\n4181 nadudvar, gutenberg u. 1.\ntermek specifikacio\ntermek megnevezese:\ntermek leirasa:\ntermckazonosito:\n2. termek adatok\nnadudvari natur joghurt 3.0% 900g.\nelofloras, homogenezett termek. zsirtartalom 3.0% (m/m). netto tomeg:\n900 g.\n5 998 202 943 889\n3. osszetevok\npasztorozott tehentej, kultura.\n4. jelolesi ajanlas\nnatur joghurt, az osszetevok nem jeloles koteles.\na termek kozvetlen fogy\n5. felhasznalas\nasztasra alkalmas.\n7. fizikai-kemiai tulajdonsagok\nszin: egyenletesen csontfeher szinu\nilat: kellemesen savanykas, a termek jellegenek megfeleloen aromas.\nallomany: -- habart, surun folyo, egynemu alvadek, kis merteku felfolozodes, enyhe savo\nkivalas megengedett.\niz: kellemesen savanykas, a termek jellegenek megfeleloen zamatos, telt, tiszta.\nkeszitette:\nebir csoport ] jovahagyta:\nm ugyvezeto igazgato\na dokumentacio a linbert mernoki tanacsado iroda szolgaltatasanak termeke\ndokumentum | haccp | oe ___| dokumentum haccp-i.1.1\ntema: elemzes ss gm 2 te = | kod:\ndokumentum | termck- m te\nspecifikacio brr - ett . | oldal: 2/5\nnov: specilikacio ,,deka epp ois . .\n(nadudvar\nverzio (datum): 1(2021.06.21.)\nnadudvari elelmiszer kft.\ntejlizeme\n8. mikrobiologiai hatarertekek\nn e m m\nsalmonella 10 0 - 0/25g\ns.aureus 5 2 | 10\npeneszgomba 2 10? 5*10deg\ne.coli 5 1 <| <10\ncoliform 5 | 10 10deg\ne. faecalis 5 2 10? 107\nszulf.red.clostridium 5 2 10 102\nenterobacteriaceae 5 2 <| 5\n9. taplalkozasi ertekek\nertek megnevezese jellemzo ertek me ertekek forrasa\nenergia (kj) 223 kj/100g bevizsgalt\nenergia (kcal) 53 keal/100g tapertekadavokbo!\nzsirtartalom 3.0 g/100g energiatartalom.\namelybol telitett zsirsavak 1.8 g/100g\nszenhidrat 2.8 g/100g\namelybol cukrok 2.4 g/100g\nfeherje 3.2 g/100g\nso 0.10 g/100g\n10. fogyaszthatosagi inform"
+}
+[
+  "60118 NÁDUDVARI JOGHURT NATÚR 3_ 900G.pdf",
+  "ocr",
+  0.65,
+  223.0,
+  53.0,
+  null,
+  2.8,
+  null,
+  3.2,
+  0.1,
+  null
+]
+[
+  "file",
+  "mode",
+  "confidence",
+  "kJ",
+  "kcal",
+  "fat_g",
+  "carbohydrate_g",
+  "sugar_g",
+  "protein_g",
+  "salt_g",
+  "sodium_g"
+]
+{
+  "product_name": null,
+  "source_file": "90327_HC ZSÍROLDÓ COMBI GRILL 1L 6DB#_2.pdf",
+  "extraction_mode": "text",
+  "serving_basis": "unknown",
+  "languages": [
+    "en"
+  ],
+  "confidence": 0.75
+}
+{}
+{
+  "energy": {
+    "kJ": null,
+    "kcal": null
+  },
+  "fat_g": null,
+  "carbohydrate_g": null,
+  "sugar_g": null,
+  "protein_g": null,
+  "salt_g": null,
+  "sodium_g": null
+}
+{
+  "saturated_fat_g": null,
+  "water_g": null,
+  "collagen_g": null
+}
+{
+  "warnings": [],
+  "pages_scanned": 0,
+  "raw_text_preview": "szamlazasi cim: 4445 nagycserkesz-halmosbokor 6.,postacim: 4401 nyiregyhaza, pf. 315., e-mail: hunchem@hunchem.hu weblap: ww.hungarochemicals.hu\ncombi grill\nspecifikacio\nkulso: vilagosbarna szinu, jellemzo szagu, tiszta folyadek.\nsuruseg 20 0c-on: 1.07 - 1.11 g/cm3\n1%-os oldat ph-erteke 250c-on: 11.7 - 12.1\np-ertek: 6.2 - 6.8\nszavatossagi ido: 12 honap\n2022.junius\nhungaro chemicals kft.\nkozponti telefonszam: +36-42-508-970"
+}
+[
+  "90327_HC ZSÍROLDÓ COMBI GRILL 1L 6DB#_2.pdf",
+  "text",
+  0.75,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null
+]

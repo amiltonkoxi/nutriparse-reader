@@ -1,0 +1,99 @@
+from __future__ import annotations
+import re
+from typing import Dict, Tuple, List
+from unidecode import unidecode
+
+ALLERGEN_KEYS = ["gluten","egg","crustaceans","fish","peanut","soy","milk","tree_nuts","celery","mustard"]
+
+# Sinônimos (lower/unidecode)
+SYN = {
+    "gluten":      [r"glut[ée]n", r"\bwheat\b", r"\bb[úu]za\b"],
+    "egg":         [r"\begg(s)?\b", r"\btoj[aá]s\b"],
+    "crustaceans": [r"\bcrustacean(s)?\b", r"r[aá]kf[ée]l[ée]k", r"\br[aá]k\b"],
+    "fish":        [r"\bfish\b", r"\bhal\b"],
+    "peanut":      [r"\bpeanut(s)?\b", r"f[öo]ldimogyor[óo]", r"\bmogyor[óo]\b"],
+    "soy":         [r"\bsoy\b", r"sz[oó]ja", r"\bsoja\b"],
+    "milk":        [r"\bmilk\b", r"\btej\b", r"lakt[oó]z", r"\blactose\b", r"tejfeh[eé]rje"],
+    "tree_nuts":   [r"\bnut(s)?\b", r"\bd[ií]?[oó]\b", r"\bmandula\b", r"\bd[ií]?[oó]f[ée]l[ée]k\b", r"hazelnut|walnut|almond|cashew|pistachio|pecan|brazil.?nut"],
+    "celery":      [r"\bcelery\b", r"\bzeller\b"],
+    "mustard":     [r"\bmustard\b", r"\bmust[aá]r\b"],
+}
+
+# Cues de status
+CUE_CONTAINS = [r"\btartalmaz\b", r"\bcontains\b"]
+CUE_TRACES   = [r"nyomokban\b", r"may contain", r"\btraces\b"]
+CUE_ABSENT   = [r"nem\s+tartalmaz\b", r"\bdoes\s+not\s+contain\b", r"\bno\s+allergen(s)?\b", r"brak\s+alergen[oó]w"]  # PL opcional
+
+SECTION_HEADS = [
+    r"allergens?\s+information", r"allerg[eé]n\s+inform[aá]ci[oó]k", r"\ballerg[eé]n\w*",
+    r"\bingredients?\b", r"\b[öo]sszetev[őo]k\b"
+]
+
+def _norm(s: str) -> str:
+    if not s: return ""
+    s = s.replace("\r", "\n")
+    s = re.sub(r"(\w)-\s*\n\s*(\w)", r"\1\2", s)   # de-hifenizar
+    s = re.sub(r"[ \t]+", " ", s)
+    s = re.sub(r"\n{2,}", "\n", s)
+    return unidecode(s.lower())
+
+def _find_sections(text: str) -> List[str]:
+    # pega blocos perto de cabeçalhos relevantes
+    spans = []
+    for m in re.finditer("|".join(SECTION_HEADS), text, flags=re.I):
+        start = max(0, m.start()-400)
+        end   = min(len(text), m.end()+1200)
+        spans.append(text[start:end])
+    # fallback: todo texto se nada encontrado
+    if not spans:
+        spans = [text]
+    return spans
+
+def _compile_any(patterns: List[str]) -> re.Pattern:
+    return re.compile("|".join(patterns), flags=re.I)
+
+RX_CONTAINS = _compile_any(CUE_CONTAINS)
+RX_TRACES   = _compile_any(CUE_TRACES)
+RX_ABSENT   = _compile_any(CUE_ABSENT)
+
+def parse_allergens(raw_text: str) -> Tuple[Dict[str, Dict[str, str]], List[str]]:
+    text = _norm(raw_text)
+    blocks = _find_sections(text)
+    out: Dict[str, Dict[str, str]] = {k: {"status":"unknown", "evidence": None} for k in ALLERGEN_KEYS}
+    warnings: List[str] = []
+
+    def update(key: str, status: str, snippet: str):
+        # prioridade: contains > traces > absent > unknown
+        current = out[key]["status"]
+        prio = {"contains":3, "traces":2, "absent":1, "unknown":0}
+        if prio[status] > prio[current]:
+            out[key] = {"status": status, "evidence": snippet.strip()[:240]}
+
+    for block in blocks:
+        # varre por status
+        has_contains = RX_CONTAINS.search(block) is not None
+        has_traces   = RX_TRACES.search(block)   is not None
+        has_absent   = RX_ABSENT.search(block)   is not None
+
+        for key in ALLERGEN_KEYS:
+            any_syn = re.compile("|".join(SYN[key]), flags=re.I)
+            if any_syn.search(block):
+                # escolhe status pela prioridade
+                snippet = block[ max(0, any_syn.search(block).start()-80) : any_syn.search(block).end()+80 ]
+                if has_contains:
+                    update(key, "contains", snippet)
+                elif has_traces:
+                    update(key, "traces", snippet)
+                elif has_absent:
+                    update(key, "absent", snippet)
+
+    # caso especial: frases húngaras bem comuns
+    # "A termék a következő allergéneket tartalmazza: glutén ... Nyomokban tejet, zellert, szóját tartalmazhat."
+    if re.search(r"allergen\w+.*tartalmaz", text):
+        if re.search(r"glut[ée]n", text): update("gluten", "contains", "allergének ... tartalmazza: glutén")
+    if re.search(r"nyomokban.*tartalmazhat", text):
+        if re.search(r"tej", text):   update("milk","traces","nyomokban tejet tartalmazhat")
+        if re.search(r"zeller", text):update("celery","traces","nyomokban zellert tartalmazhat")
+        if re.search(r"sz[oó]ja", text): update("soy","traces","nyomokban szóját tartalmazhat")
+
+    return out, warnings

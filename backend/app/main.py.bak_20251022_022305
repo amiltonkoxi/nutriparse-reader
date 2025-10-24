@@ -1,0 +1,155 @@
+# app/main.py
+from __future__ import annotations
+
+import os
+import tempfile
+from typing import Any, Dict, Optional
+
+from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
+# Local modules
+from extractors.text_extractor import extract_text_from_pdf, parse_nutrition
+from extractors.ocr_extractor import extract_text_via_ocr
+from parsers.allergen_parser import parse_allergens
+
+
+# --------------------------
+# Helpers
+# --------------------------
+def _postprocess_nutrition(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Nutrition post-processing:
+      - derive kcal from kJ when missing
+      - derive salt_g from sodium_g (×2.54) when missing + add note
+      - if sugar_g > 60 for 'per 100g', null it and add warning
+    """
+    try:
+        nutrition: Dict[str, Any] = payload.get("nutrition") or {}
+        energy: Dict[str, Any] = nutrition.get("energy") or {}
+        diagnostics: Dict[str, Any] = payload.setdefault("diagnostics", {})
+        warnings = diagnostics.setdefault("warnings", [])
+
+        # kJ -> kcal
+        kj = energy.get("kJ")
+        kcal = energy.get("kcal")
+        if isinstance(kj, (int, float)) and kcal is None:
+            energy["kcal"] = int(round(float(kj) / 4.184))
+
+        # sodium -> salt
+        sodium = nutrition.get("sodium_g")
+        salt = nutrition.get("salt_g")
+        if salt is None and isinstance(sodium, (int, float)):
+            nutrition["salt_g"] = round(float(sodium) * 2.54, 2)
+            note = "salt computed as sodium×2.54"
+            notes = nutrition.get("notes") or ""
+            nutrition["notes"] = (notes + ("; " if notes else "") + note)
+
+        # sanity check sugar
+        sugar = nutrition.get("sugar_g")
+        if isinstance(sugar, (int, float)) and sugar > 60:
+            warnings.append(
+                f"sugar_g value {sugar} looks invalid for per 100g; nulled (likely from ingredient %)."
+            )
+            nutrition["sugar_g"] = None
+
+        payload["nutrition"] = nutrition
+        payload["nutrition"]["energy"] = energy
+    except Exception:
+        # never fail the request because of post-processing
+        pass
+
+    return payload
+
+
+# --------------------------
+# FastAPI app
+# --------------------------
+app = FastAPI(title="NutriParse Reader API", version="0.2.2")
+# Allow multiple origins dynamically (comma separated)
+origins = os.getenv(
+    "CORS_ORIGINS",
+    "http://localhost:3000,http://127.0.0.1:3000"
+).split(",")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[o.strip() for o in origins],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# --------------------------
+# Routes
+# --------------------------
+@app.get("/health")
+def health() -> Dict[str, str]:
+    return {"status": "ok"}
+
+
+@app.post("/extract")
+async def extract(file: UploadFile = File(...)) -> JSONResponse:
+    # Quick content-type guard (still allow if empty)
+    if file.content_type not in (None, "", "application/pdf"):
+        raise HTTPException(status_code=415, detail="Only PDF files are supported.")
+
+    # Save to a secure temp file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        tmp.write(await file.read())
+        tmp_path = tmp.name
+
+    try:
+        # 1) Try text extraction first; fallback to OCR when text is too short
+        text = extract_text_from_pdf(tmp_path) or ""
+        mode = "text"
+        if len(text.strip()) < 80:
+            mode = "ocr"
+            text = extract_text_via_ocr(tmp_path) or ""
+
+        # 2) Parse structured data
+        allergens = parse_allergens(text)            # dict[str, {status,evidence}]
+        nutrition = parse_nutrition(text)            # dict with energy + nutrients
+
+        # 3) Compose response
+        payload: Dict[str, Any] = {
+            "meta": {
+                "product_name": None,               # (optional enhancement)
+                "source_file": file.filename,
+                "extraction_mode": mode,            # "text" or "ocr"
+                "serving_basis": "per 100g",
+                "languages": ["en", "hu", "pl"],    # heuristic
+                "confidence": 0.75 if mode == "text" else 0.60,
+            },
+            "allergens": allergens,
+            "nutrition": nutrition,
+            "extras": {
+                "saturated_fat_g": None,
+                "water_g": None,
+                "collagen_g": None,
+            },
+            "diagnostics": {
+                "warnings": [],
+                "pages_scanned": 0,                 # update if you add per-page OCR
+                "raw_text_preview": (text[:4000] if text else None),
+            },
+        }
+
+        # 4) Nutrition post-processing
+        payload = _postprocess_nutrition(payload)
+
+        # 5) Return
+        return JSONResponse(content=payload, status_code=200)
+
+    except Exception as exc:
+        # Make sure the client receives a useful error
+        raise HTTPException(status_code=500, detail=f"Extraction failed: {exc}") from exc
+
+    finally:
+        # Always try to remove the temp file
+        try:
+            os.unlink(tmp_path)
+        except Exception:
+            pass

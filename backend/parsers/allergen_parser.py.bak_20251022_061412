@@ -1,0 +1,112 @@
+from __future__ import annotations
+import re
+from typing import Dict, Optional
+from unidecode import unidecode
+
+ALLERGEN_KEYS = [
+    "gluten","egg","crustaceans","fish","peanut","soy","milk","tree_nuts","celery","mustard"
+]
+
+# Sinônimos EN + HU (normalizados com unidecode, minúsculo)
+SYN = {
+    "gluten":       ["gluten","wheat","buza"],
+    "egg":          ["egg","tojas"],
+    "crustaceans":  ["crustacean","crustaceans","rak","rakfelek"],
+    "fish":         ["fish","hal"],
+    "peanut":       ["peanut","foldimogyoro"],
+    "soy":          ["soy","soja","szoja"],
+    "milk":         ["milk","tej","lactose","laktoz","tejszarmazek"],
+    "tree_nuts":    ["tree nut","tree nuts","dio","diofelek","hazelnut","walnut","almond","cashew","pistachio","pecan","brazil nut","brazil dio"],
+    "celery":       ["celery","zeller"],
+    "mustard":      ["mustard","mustar"],
+}
+
+# "sem alergénios" globais (EN/HU)
+GLOBAL_ABSENT_PATTERNS = [
+    r"\bno allergens?\b",
+    r"\bfree from allergens?\b",
+    r"\bdoes not contain (any )?allergen(s)?\b",
+    r"\bnincs allerg[eé]n\b",
+    r"\ballerg[eé]n anyagokat nem tartalmaz\b",
+]
+
+# Linhas do tipo "Allergén információ: hal" / "Allergen information: fish"
+FISH_ONLY_INFO = [
+    r"allerg[eé]n inform[aá]ci[oó].*?\bhal\b",
+    r"allergen (?:info(?:rmation)?|information).*?\bfish\b",
+]
+
+RANK = {"unknown":0, "absent":1, "traces":2, "contains":3}
+
+def _norm(text: str) -> str:
+    t = unidecode(text or "").lower()
+    t = t.replace("\r", "\n")
+    t = re.sub(r"[ \t]+", " ", t)
+    t = re.sub(r"\n{2,}", "\n", t)
+    return t
+
+def _empty() -> Dict[str, Dict[str, Optional[str]]]:
+    return {k: {"status": "unknown", "evidence": None} for k in ALLERGEN_KEYS}
+
+def _bump(res, key, status, evidence):
+    if RANK[status] > RANK[res[key]["status"]]:
+        res[key]["status"] = status
+        res[key]["evidence"] = evidence
+
+def _any(patterns, text) -> Optional[str]:
+    for p in patterns:
+        m = re.search(p, text, flags=re.I)
+        if m:
+            return m.group(0)
+    return None
+
+def parse_allergens(raw_text: str):
+    text = raw_text or ""
+    norm = _norm(text)
+    res = _empty()
+
+    # 1) nenhum alergénico global
+    ev = _any(GLOBAL_ABSENT_PATTERNS, norm)
+    if ev:
+        for k in ALLERGEN_KEYS:
+            _bump(res, k, "absent", ev)
+        return res
+
+    # 2) fish-only na seção de alergénicos
+    ev = _any(FISH_ONLY_INFO, norm)
+    if ev:
+        for k in ALLERGEN_KEYS:
+            _bump(res, k, "absent", ev)
+        _bump(res, "fish", "contains", ev)
+        return res
+
+    # 3) CONTAINS (EN/HU)
+    for m in re.finditer(r"\b(contains|tartalmaz)\b([^.\n]{0,120})", norm, flags=re.I):
+        window = m.group(2)
+        ev_here = m.group(0)
+        for key, names in SYN.items():
+            for token in names:
+                if re.search(rf"\b{re.escape(token)}(ok|ek|et|ot|at|t)?\b", window):
+                    _bump(res, key, "contains", ev_here)
+                    break
+
+    # 4) TRACES (may contain / nyomokban ... tartalmazhat)
+    for m in re.finditer(r"\bmay contain\b([^.\n]{0,150})", norm, flags=re.I):
+        window = m.group(1)
+        ev_here = m.group(0)
+        for key, names in SYN.items():
+            for token in names:
+                if re.search(rf"\b{re.escape(token)}\b", window):
+                    _bump(res, key, "traces", ev_here)
+                    break
+
+    for m in re.finditer(r"nyomokban([^.\n]{0,150})tartalmazhat", norm, flags=re.I):
+        window = m.group(1)
+        ev_here = m.group(0)
+        for key, names in SYN.items():
+            for token in names:
+                if re.search(rf"\b{re.escape(token)}\b", window):
+                    _bump(res, key, "traces", ev_here)
+                    break
+
+    return res
