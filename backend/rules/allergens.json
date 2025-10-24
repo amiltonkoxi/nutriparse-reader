@@ -1,12 +1,126 @@
 {
-  "gluten":       { "contains": ["\\bgluten\\b","\\bwheat\\b","\\bbuza\\b"], "traces": ["may contain gluten","nyomokban gluten"], "absent": ["gluten\\s*-?\\s*free","nem tartalmaz gluten","allergen anyagokat nem tartalmaz"] },
-  "egg":          { "contains": ["\\begg\\b","\\btojas\\b"],               "traces": ["may contain egg","nyomokban tojas"],      "absent": ["egg\\s*-?\\s*free","nem tartalmaz tojast","allergen anyagokat nem tartalmaz"] },
-  "crustaceans":  { "contains": ["crustacean","rak"],                      "traces": ["may contain crustaceans?"],              "absent": ["no crustaceans","nem tartalmaz rak","allergen anyagokat nem tartalmaz"] },
-  "fish":         { "contains": ["\\bfish\\b","\\bhal\\b"],                "traces": ["may contain fish"],                      "absent": ["no fish","nem tartalmaz hal","allergen anyagokat nem tartalmaz"] },
-  "peanut":       { "contains": ["\\bpeanut\\b","foldimogyoro"],           "traces": ["may contain peanuts?"],                  "absent": ["peanut\\s*-?\\s*free","nem tartalmaz foldimogyorot","allergen anyagokat nem tartalmaz"] },
-  "soy":          { "contains": ["\\bsoy\\b","szoja"],                     "traces": ["may contain soy"],                       "absent": ["soy\\s*-?\\s*free","nem tartalmaz szojat","allergen anyagokat nem tartalmaz"] },
-  "milk":         { "contains": ["\\bmilk\\b","\\btej\\b","lactose","laktoz"], "traces": ["may contain milk"],                 "absent": ["milk\\s*-?\\s*free","lactose\\s*-?\\s*free","nem tartalmaz tejet","allergen anyagokat nem tartalmaz"] },
-  "tree_nuts":    { "contains": ["hazelnut","walnut","almond","cashew","pistachio","pecan","brazil\\s+nut","\\bdio\\b"], "traces": ["may contain nuts?"], "absent": ["nut\\s*-?\\s*free","nem tartalmaz diofeleket","allergen anyagokat nem tartalmaz"] },
-  "celery":       { "contains": ["\\bcelery\\b","\\bzeller\\b"],           "traces": ["may contain celery"],                    "absent": ["no celery","nem tartalmaz zellert","allergen anyagokat nem tartalmaz"] },
-  "mustard":      { "contains": ["\\bmustard\\b","\\bmustar\\b"],          "traces": ["may contain mustard"],                   "absent": ["no mustard","nem tartalmaz mustart","allergen anyagokat nem tartalmaz"] }
+  "gluten": {
+    "contains": [
+      "(tartalmaz[^\\n\\.]*gluten|gluten[^\\n\\.]*tartalmaz|contains[^\\n\\.]*gluten)"
+    ],
+    "traces": [
+      "(nyomokban[^\\n\\.]*gluten|may contain[^\\n\\.]*gluten|moze zawierac[^\\n\\.]*gluten|traces[^\\n\\.]*gluten)"
+    ],
+    "absent": [
+      "(nem tartalmaz[^\\n\\.]*gluten|gluten\\s*-?\\s*free|does not contain[^\\n\\.]*gluten|no\\s+gluten|nie zawiera[^\\n\\.]*glutenu)"
+    ]
+  },
+  "egg": {
+    "contains": [
+      "(tartalmaz[^\\n\\.]*tojas|tojas[^\\n\\.]*tartalmaz|contains[^\\n\\.]*egg)"
+    ],
+    "traces": [
+      "(nyomokban[^\\n\\.]*tojas|may contain[^\\n\\.]*egg|moze zawierac[^\\n\\.]*jaja)"
+    ],
+    "absent": [
+      "(nem tartalmaz[^\\n\\.]*tojas(t)?|egg\\s*-?\\s*free|does not contain[^\\n\\.]*egg|no\\s+egg|nie zawiera[^\\n\\.]*jaj)"
+    ]
+  },
+  "crustaceans": {
+    "contains": [
+      "(tartalmaz[^\\n\\.]*rak(ot)?|rak(ot)?[^\\n\\.]*tartalmaz|contains[^\\n\\.]*crustaceans?)"
+    ],
+    "traces": [
+      "(nyomokban[^\\n\\.]*rak(ot)?|may contain[^\\n\\.]*crustaceans?|moze zawierac[^\\n\\.]*skorupiaki)"
+    ],
+    "absent": [
+      "(nem tartalmaz[^\\n\\.]*rak(ot)?|no\\s+crustaceans?|does not contain[^\\n\\.]*crustaceans?|nie zawiera[^\\n\\.]*skorupiakow?)"
+    ]
+  },
+  "fish": {
+    "contains": [
+      "(tartalmaz[^\\n\\.]*hal(at)?|hal(at)?[^\\n\\.]*tartalmaz|contains[^\\n\\.]*fish)"
+    ],
+    "traces": [
+      "(nyomokban[^\\n\\.]*hal(at)?|may contain[^\\n\\.]*fish|moze zawierac[^\\n\\.]*ryby?)"
+    ],
+    "absent": [
+      "(nem tartalmaz[^\\n\\.]*hal(at)?|no\\s+fish|does not contain[^\\n\\.]*fish|nie zawiera[^\\n\\.]*ryb)"
+    ]
+  },
+  "peanut": {
+    "contains": [
+      "(tartalmaz[^\\n\\.]*foldimogyoro(t)?|foldimogyoro(t)?[^\\n\\.]*tartalmaz|contains[^\\n\\.]*peanuts?)"
+    ],
+    "traces": [
+      "(nyomokban[^\\n\\.]*foldimogyoro(t)?|may contain[^\\n\\.]*peanuts?|moze zawierac[^\\n\\.]*orzeszki ziemne)"
+    ],
+    "absent": [
+      "(nem tartalmaz[^\\n\\.]*foldimogyoro(t)?|peanut\\s*-?\\s*free|does not contain[^\\n\\.]*peanuts?|nie zawiera[^\\n\\.]*orzeszkow ziemnych)"
+    ]
+  },
+  "soy": {
+    "contains": [
+      "(tartalmaz[^\\n\\.]*szoja(t)?|szoja(t)?[^\\n\\.]*tartalmaz|contains[^\\n\\.]*soy)"
+    ],
+    "traces": [
+      "(nyomokban[^\\n\\.]*szoja(t)?|may contain[^\\n\\.]*soy|moze zawierac[^\\n\\.]*soje)"
+    ],
+    "absent": [
+      "(nem tartalmaz[^\\n\\.]*szoja(t)?|soy\\s*-?\\s*free|does not contain[^\\n\\.]*soy|nie zawiera[^\\n\\.]*soi)"
+    ]
+  },
+  "milk": {
+    "contains": [
+      "(tartalmaz[^\\n\\.]*tej(et)?|tej(et)?[^\\n\\.]*tartalmaz|contains[^\\n\\.]*milk|contains[^\\n\\.]*lactose)"
+    ],
+    "traces": [
+      "(nyomokban[^\\n\\.]*tej(et)?|may contain[^\\n\\.]*milk|moze zawierac[^\\n\\.]*mleko)"
+    ],
+    "absent": [
+      "(nem tartalmaz[^\\n\\.]*tej(et)?|milk\\s*-?\\s*free|lactose\\s*-?\\s*free|does not contain[^\\n\\.]*milk|nie zawiera[^\\n\\.]*mleka)"
+    ]
+  },
+  "tree_nuts": {
+    "contains": [
+      "(tartalmaz[^\\n\\.]*dio(felek)?(et)?|dio(felek)?(et)?[^\\n\\.]*tartalmaz|contains[^\\n\\.]*nuts?)",
+      "hazelnut|walnut|almond|cashew|pistachio|pecan|brazil\\s+nut",
+      "orzech(?! ziemny)"
+    ],
+    "traces": [
+      "(nyomokban[^\\n\\.]*dio(felek)?(et)?|may contain[^\\n\\.]*nuts?|moze zawierac[^\\n\\.]*orzechy)"
+    ],
+    "absent": [
+      "(nem tartalmaz[^\\n\\.]*dio(felek)?(et)?|nut\\s*-?\\s*free|does not contain[^\\n\\.]*nuts?|nie zawiera[^\\n\\.]*orzechow?)"
+    ]
+  },
+  "celery": {
+    "contains": [
+      "(tartalmaz[^\\n\\.]*zeller(t)?|zeller(t)?[^\\n\\.]*tartalmaz|contains[^\\n\\.]*celery)"
+    ],
+    "traces": [
+      "(nyomokban[^\\n\\.]*zeller(t)?|may contain[^\\n\\.]*celery|moze zawierac[^\\n\\.]*seler)"
+    ],
+    "absent": [
+      "(nem tartalmaz[^\\n\\.]*zeller(t)?|no\\s+celery|does not contain[^\\n\\.]*celery|nie zawiera[^\\n\\.]*selera)"
+    ]
+  },
+  "mustard": {
+    "contains": [
+      "(tartalmaz[^\\n\\.]*mustar(t)?|mustar(t)?[^\\n\\.]*tartalmaz|contains[^\\n\\.]*mustard)"
+    ],
+    "traces": [
+      "(nyomokban[^\\n\\.]*mustar(t)?|may contain[^\\n\\.]*mustard|moze zawierac[^\\n\\.]*musztard[ey])"
+    ],
+    "absent": [
+      "(nem tartalmaz[^\\n\\.]*mustar(t)?|no\\s+mustard|does not contain[^\\n\\.]*mustard|nie zawiera[^\\n\\.]*musztardy)"
+    ]
+  },
+  "_globals": {
+    "no_allergens": [
+      "allergen anyagokat nem tartalmaz",
+      "allergen mentes",
+      "brak alergenow",
+      "bez alergenow",
+      "no allergens"
+    ],
+    "fish_line": [
+      "allergen informacio[^:\\n]*:\\s*hal"
+    ]
+  }
 }
