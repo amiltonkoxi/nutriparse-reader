@@ -1,0 +1,12 @@
+# Ignore files not needed inside the production image
+.dockerignore
+.git
+__pycache__
+*.py[cod]
+*.bak
+venv
+.venv
+logs/
+tmp/
+samples/
+*.pdf

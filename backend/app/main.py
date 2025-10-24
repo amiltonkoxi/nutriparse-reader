@@ -161,9 +161,15 @@ def compute_confidence(meta, allergens, nutrition):
 
 
 app = FastAPI(title="NutriParse Reader API", version="0.3.1")
+
+# Allow requests from the deployed Vercel frontend and local preview.
+_allowed_origins = os.getenv("ALLOWED_ORIGINS", "https://nutriparse-reader.vercel.app,http://localhost:3000")
+ALLOWED_ORIGINS = [origin.strip() for origin in _allowed_origins.split(",") if origin.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.get("/health")
@@ -231,6 +237,7 @@ async def extract(file: UploadFile = File(...)):
         if allergen_known == 0:
             warnings.append("No explicit allergen statements detected.")
 
+        # Move optional nutrient fields into extras with their evidence.
         extras_data: Dict[str, Any] = {}
         optional_fields = ["collagen_g", "water_g"]
         for field in optional_fields:

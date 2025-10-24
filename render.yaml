@@ -1,13 +1,12 @@
 services:
   - type: web
     name: nutriparse-reader-api
-    env: python
+    runtime: docker
     region: frankfurt
     plan: free
-    rootDir: backend
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.12.3
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
     healthCheckPath: /health
+    envVars:
+      - key: ALLOWED_ORIGINS
+        value: https://nutriparse-reader.vercel.app,http://localhost:3000
