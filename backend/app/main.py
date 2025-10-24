@@ -168,15 +168,24 @@ _allowed_origins = os.getenv(
     "https://nutriparsereader.vercel.app,http://localhost:3000"
 )
 ALLOWED_ORIGINS = [origin.strip() for origin in _allowed_origins.split(",") if origin.strip()]
-ALLOWED_ORIGIN_REGEX = os.getenv("ALLOWED_ORIGIN_REGEX", r"^https://.*vercel\.app$")
+
+# Ensure critical Vercel and local origins are always present.
+_default_origins = {
+    "https://nutriparsereader.vercel.app",
+    "https://nutriparsereadervercelapp-git-main-amilton-koxis-projects.vercel.app",
+    "http://localhost:3000",
+}
+if not ALLOWED_ORIGINS:
+    ALLOWED_ORIGINS = list(_default_origins)
+else:
+    ALLOWED_ORIGINS = list({*ALLOWED_ORIGINS, *_default_origins})
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_origin_regex=ALLOWED_ORIGIN_REGEX,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    allow_credentials=True,
 )
 # --- end CORS config ---
 
