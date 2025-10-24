@@ -1,131 +1,103 @@
 <h1 align="center">NutriParse Reader</h1>
 
 <p align="center">
-  End-to-end toolkit for extracting allergens and nutrition facts from food product PDFs.<br/>
-  University of Debrecen · Developer Test Project · 2025
+  Developer Test Project · University of Debrecen · 2025
 </p>
 
 ---
 
-## Snapshot
+## Project Overview
 
-![NutriParse Reader UI](./image/Nutriparse.jpg)
-
-NutriParse Reader ingests both native and scanned PDFs, recognises allergen statements, and normalises nutrition panels into a structured dataset. The workflow is tailored to the assignment brief from Dr. Tamás Bérczes and demonstrates how a production-ready submission could look.
+NutriParse Reader is a full-stack web application that automatically extracts allergen statements and nutrition facts from food product PDFs. Both digitally generated PDFs and scanned/image-based PDFs are supported. The backend uses AI-augmented parsing (rule-based extraction with LLM assistance) to detect allergens and nutrition values, while the frontend presents the results in both table and JSON formats for quick review.
 
 ---
 
-## Why it matters
+## Features
 
-- **Two modes, one flow.** Text-first parsing with PyPDFium2, OCR fallback with Tesseract whenever the document is image-based.  
-- **Assignment-aligned outputs.** Focused on the ten required allergens and the six nutrition fields, with confidence scoring and evidence traces.  
-- **Concise operator experience.** Drag-and-drop, queue management, rich result cards, and JSON export in one screen.  
-- **Deployment-ready.** Next.js frontend (app router) paired with a FastAPI service, easy to host separately or together.
-
----
-
-## Architecture at a glance
-
-```text
-Next.js frontend
- └─ uploads PDF → POST /extract
-
-FastAPI backend
- ├─ text_extractor.py (PyPDFium2)
- ├─ ocr_extractor.py  (Tesseract)
- ├─ nutrition_parser.py / allergen_parser.py
- └─ response builder (JSON + metadata)
-```
-
-The parsers rely on keyword heuristics and lightweight rule sets, delivering deterministic answers without requiring external APIs. If the text extractor fails to recover enough tokens, the OCR path re-runs the pipeline automatically.
+- Upload up to **two PDFs per run** using drag & drop or a file picker.
+- Backend processing with AI/LLM logic to interpret ingredient statements and nutrition tables.
+- Extraction of the **10 required allergens**: Gluten, Egg, Crustaceans, Fish, Peanut, Soy, Milk, Tree nuts, Celery, Mustard.
+- Extraction of the **6 nutrition values**: Energy, Fat, Carbohydrate, Sugar, Protein, Sodium.
+- Structured output in a responsive **table view** plus a raw **JSON view**.
+- Automatic **OCR fallback** for scanned or photo-based PDFs.
 
 ---
 
-## Feature tour
+## Tech Stack
 
-| Area            | Highlights                                                                                   |
-| --------------- | --------------------------------------------------------------------------------------------- |
-| **Upload**      | Drag & drop, direct select, multi-file queue, PDF MIME enforcement, guest vs. logged-in caps  |
-| **Processing**  | Sequential API posting with optimistic UI, status hints, and defensive error messaging       |
-| **Results**     | Allergen pills with evidence tooltip, nutrition tiles per 100 g, mode/confidence indicators  |
-| **Export**      | One-click JSON copy for downstream systems or QA review                                      |
-
----
-
-## Tech stack
-
-| Layer        | Technology & Notes                                           |
-| ------------ | ------------------------------------------------------------ |
-| Frontend     | Next.js 14, React Server Components, Tailwind CSS, TypeScript |
-| Backend      | FastAPI, Pydantic, uvicorn                                   |
-| OCR          | Tesseract 5 via pytesseract                                  |
-| PDF parsing  | PyPDFium2 for deterministic text extraction                  |
-| Styling      | Tailwind with bespoke components (Dropzone, ResultCard)      |
+| Layer     | Technologies |
+|-----------|--------------|
+| Frontend  | Next.js (React), Tailwind CSS |
+| Backend   | FastAPI (Python) |
+| OCR       | Tesseract via `pytesseract` |
+| Parsing   | Custom allergen & nutrition parsers with LLM assistance |
 
 ---
 
-## Getting started locally
+## Installation & Usage
 
-### 1. Backend
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/amiltonkoxi/nutriparse-reader.git
+   cd nutriparse-reader
+   ```
 
-```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate           # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-```
+2. **Install backend dependencies**
+   ```bash
+   cd backend
+   python3 -m venv .venv
+   source .venv/bin/activate        # Windows: .venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
-The API listens on `http://127.0.0.1:8000`. The main endpoint is `POST /extract` accepting a single `file` form field.
+3. **Start the backend**
+   ```bash
+   uvicorn app.main:app --reload
+   ```
 
-### 2. Frontend
+4. **Install frontend dependencies**
+   ```bash
+   cd ../frontend
+   npm install
+   echo "NEXT_PUBLIC_API_BASE=http://127.0.0.1:8000" > .env.local
+   ```
 
-```bash
-cd frontend
-npm install
-echo "NEXT_PUBLIC_API_BASE=http://127.0.0.1:8000" > .env.local
-npm run dev
-```
+5. **Start the frontend**
+   ```bash
+   npm run dev
+   ```
 
-Open `http://localhost:3000` and upload one of the sample PDFs found in `/samples`.
-
----
-
-## Repository layout
-
-```text
-nutriparse-reader/
-├─ backend/
-│  ├─ app/main.py                 # FastAPI entry point
-│  ├─ extractors/                 # Text and OCR extraction helpers
-│  ├─ parsers/                    # Allergen and nutrition post-processing
-│  ├─ rules/                      # Keyword dictionaries and thresholds
-│  └─ requirements.txt
-├─ frontend/
-│  ├─ app/                        # Next.js routes, layout, page shell
-│  ├─ components/                 # Dropzone, ResultCard, HowItWorks, etc.
-│  ├─ lib/                        # API client, shared types
-│  └─ tailwind.config.ts
-└─ samples/                       # Real-world PDFs used for testing
-```
+6. **Open the app**
+   Visit `http://localhost:3000` in your browser, select up to two PDFs, and inspect the extracted data.
 
 ---
 
-## Deliverables checklist (per brief)
+## Screenshots
 
-- ✅ Source code for both frontend and backend  
-- ✅ User-focused walkthrough (this README + in-app hints)  
-- ✅ Demonstration video (recorded after deployment)  
-- ✅ Live environment URL (Vercel + Render pairing)  
-
-Refer to the Microsoft Teams group “Developer Test Projects – 2025” for submission logistics.
+| Preview | Description |
+|---------|-------------|
+| ![Homepage](image/Dark.png) | **Homepage (dark theme)** showing upload panel, queue, and action buttons. |
+| ![File Drop](image/filedrop.png) | **Dropping PDFs** – drag & drop interaction with two documents selected. |
+| ![Extraction Result](image/result.png) | **Extraction view** – tabbed table/JSON results, confidence, and evidence. |
 
 ---
 
-## Credits
+## Deliverables Mapping
 
-- **Student:** Amilton Koxi, MSc Computer Science  
-- **Supervisor:** Dr. Tamás Bérczes  
-- **Institution:** University of Debrecen, Hungary  
+| Assignment Deliverable | Status |
+|------------------------|--------|
+| Source code            | ✅ Included in this repository (frontend + backend). |
+| Documentation          | ✅ This README provides setup, architecture, and usage details. |
+| Demonstration video    | 🔧 *To be added.* Recording will showcase upload and extraction flow. |
+| Live deployment URL    | 🔧 *To be added.* Hosted version will be linked once deployed. |
 
-_Parsing food, feeding data – NutriParse Reader · 2025_
+---
+
+## License & Acknowledgments
+
+- **License:** MIT License — see `LICENSE`.
+- **Acknowledgment:** This project implements the developer assignment described by **Dr. Tamás Bérczes** (University of Debrecen, 2025). Many thanks for the detailed specification and guidance.
+
+---
+
+NutriParse Reader · 2025

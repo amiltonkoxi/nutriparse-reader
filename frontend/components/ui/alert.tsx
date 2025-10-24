@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 const alertVariants = cva("relative w-full rounded-lg border p-4", {
   variants: {
     variant: {
-      default: "bg-background text-foreground",
-      destructive: "text-destructive border-destructive/50 dark:border-destructive [&>svg]:text-destructive",
+      default: "border-slate-700 bg-slate-900 text-slate-200",
+      destructive: "border-rose-500/60 bg-rose-500/10 text-rose-200 [&>svg]:text-rose-300",
     },
   },
   defaultVariants: { variant: "default" },

@@ -8,20 +8,25 @@ import { ClipboardCopy, Check } from "lucide-react";
 
 type AllergenStatus = "contains" | "traces" | "absent" | "unknown";
 
+type NutrientValue = number | string | null;
+
 type ApiLike = {
   meta?: { source_file?: string; extraction_mode?: "text" | "ocr"; confidence?: number | null };
   allergens?: Record<string, { status: AllergenStatus; evidence: string | null }>;
-  nutrition?: {
-    energy?: { kJ?: number | null; kcal?: number | null };
-    fat_g?: number | null;
-    carbohydrate_g?: number | null;
-    sugar_g?: number | null;
-    protein_g?: number | null;
-    salt_g?: number | null;
-    sodium_g?: number | null;
-    notes?: string | null;
+  nutrition_per_100g?: {
+    energy_kJ?: NutrientValue;
+    energy_kcal?: NutrientValue;
+    fat_g?: NutrientValue;
+    saturated_fat_g?: NutrientValue;
+    carbohydrate_g?: NutrientValue;
+    sugars_g?: NutrientValue;
+    protein_g?: NutrientValue;
+    salt_g?: NutrientValue;
+    sodium_mg?: NutrientValue;
+    collagen_g?: NutrientValue;
+    water_g?: NutrientValue;
   };
-  diagnostics?: { warnings?: string[]; raw_text_preview?: string };
+  diagnostics?: { warnings?: string[]; raw_text_preview?: string; nutrition_evidence?: Record<string, string | null>; notes?: string[] | null };
 };
 
 const cx = (...c: Array<string | false | undefined>) => c.filter(Boolean).join(" ");
@@ -36,10 +41,13 @@ const STATUS_STYLES: Record<AllergenStatus, string> = {
 const TILE_COLORS: Record<string, string> = {
   Energy: "bg-emerald-600 text-white",
   Fat: "bg-rose-600 text-white",
+  "Sat. Fat": "bg-rose-500 text-white",
   Carbs: "bg-orange-600 text-white",
   Sugar: "bg-pink-600 text-white",
   Protein: "bg-violet-600 text-white",
   Salt: "bg-cyan-600 text-white",
+  Water: "bg-sky-600 text-white",
+  Collagen: "bg-indigo-500 text-white",
 };
 
 /* ------------ Copy JSON helper; toast is anchored to the trigger button ------------ */
@@ -73,11 +81,9 @@ function CopyJsonButton({ json }: { json: any }) {
         onClick={onClick}
         disabled={disabled}
         className={cx(
-          "inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-semibold",
-          "bg-indigo-700 text-white border-indigo-800 shadow-sm",
-          "hover:bg-indigo-600 active:bg-indigo-800",
+          "inline-flex items-center gap-1.5 rounded-md border border-indigo-500 px-3 py-1.5 text-xs font-semibold",
+          "bg-indigo-600 text-white shadow-sm hover:bg-indigo-500 active:bg-indigo-700",
           "focus:outline-none focus:ring-2 focus:ring-indigo-400/60 focus:ring-offset-2",
-          "dark:bg-indigo-500 dark:border-indigo-400 dark:hover:bg-indigo-400 dark:active:bg-indigo-500",
           "disabled:opacity-60 disabled:cursor-not-allowed"
         )}
         aria-label="Copy JSON"
@@ -105,49 +111,71 @@ export default function ResultCard({ data }: { data?: ApiLike | null }) {
 
   const meta = data?.meta;
   const allergens = data?.allergens;
-  const nutrition = data?.nutrition;
+  const nutrition = data?.nutrition_per_100g;
+  const notes = (data?.diagnostics?.notes ?? []).filter((n): n is string => Boolean(n && n.trim().length));
 
   if (!data || !meta || !allergens || !nutrition) {
     return (
-      <div className="rounded border bg-slate-50 p-4 text-sm text-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:border-slate-700">
+      <div className="rounded border border-slate-700 bg-slate-900 p-4 text-sm text-slate-200">
         No data yet. Upload a PDF and click <b>Process</b>.
       </div>
     );
   }
 
+  const energyParts: string[] = [];
+  const kjDisplay = fmtUnit(nutrition.energy_kJ, "kJ");
+  if (kjDisplay) energyParts.push(kjDisplay);
+  const kcalDisplay = fmtUnit(nutrition.energy_kcal, "kcal");
+  if (kcalDisplay) energyParts.push(kcalDisplay);
+  const energyDisplay = energyParts.length ? energyParts.join(" · ") : "—";
+
+  const saltValue = fmtUnit(nutrition.salt_g, "g");
+  let saltDisplay = saltValue ?? "—";
+  if (!saltValue && nutrition.sodium_mg != null) {
+    if (typeof nutrition.sodium_mg === "number") {
+      saltDisplay = `${(nutrition.sodium_mg * 2.54 / 1000).toFixed(2)} g`;
+    } else if (typeof nutrition.sodium_mg === "string" && nutrition.sodium_mg.trim().length > 0) {
+      saltDisplay = `${nutrition.sodium_mg} mg Na`;
+    }
+  }
+
   const tiles = [
-    { label: "Energy", value: `${nutrition.energy?.kJ ?? "—"} kJ` },
+    { label: "Energy", value: energyDisplay },
     { label: "Fat", value: fmtG(nutrition.fat_g) },
     { label: "Carbs", value: fmtG(nutrition.carbohydrate_g) },
-    { label: "Sugar", value: fmtG(nutrition.sugar_g) },
+    { label: "Sugar", value: fmtG(nutrition.sugars_g) },
     { label: "Protein", value: fmtG(nutrition.protein_g) },
-    {
-      label: "Salt",
-      value:
-        nutrition.salt_g ??
-        (nutrition.sodium_g != null ? `${(Number(nutrition.sodium_g) * 2.54).toFixed(2)} g` : "—"),
-    },
+    { label: "Salt", value: saltDisplay },
   ];
+  if (nutrition.saturated_fat_g != null && !(typeof nutrition.saturated_fat_g === "string" && !nutrition.saturated_fat_g.trim())) {
+    tiles.splice(2, 0, { label: "Sat. Fat", value: fmtG(nutrition.saturated_fat_g) });
+  }
+  if (nutrition.water_g != null && !(typeof nutrition.water_g === "string" && !nutrition.water_g.trim())) {
+    tiles.push({ label: "Water", value: fmtG(nutrition.water_g) });
+  }
+  if (nutrition.collagen_g != null && !(typeof nutrition.collagen_g === "string" && !nutrition.collagen_g.trim())) {
+    tiles.push({ label: "Collagen", value: fmtG(nutrition.collagen_g) });
+  }
 
   const confidencePct = Math.round((meta.confidence ?? 0) * 100);
   const modeLabel = meta.extraction_mode === "ocr" ? "OCR mode" : "Text mode";
 
   return (
-    <Card className="rounded-2xl border bg-white/70 shadow-sm transition hover:shadow-md dark:bg-slate-900/80 dark:border-slate-700">
+    <Card className="rounded-2xl border border-slate-700 bg-slate-900/80 shadow-sm transition hover:shadow-md">
       <CardHeader className="pb-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <CardTitle className="text-lg sm:text-xl text-slate-900 dark:text-white">
+            <CardTitle className="text-lg sm:text-xl text-slate-100">
               Extraction Results
             </CardTitle>
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
-              <span className="mr-2 truncate text-slate-600 dark:text-slate-200">
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-300">
+              <span className="mr-2 truncate">
                 File: {meta.source_file ?? "—"}
               </span>
-              <span className="inline-block rounded border px-2 py-0.5 bg-slate-200 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600">
+              <span className="inline-block rounded border border-slate-600 bg-slate-800 px-2 py-0.5 text-slate-200">
                 {modeLabel}
               </span>
-              <span className="inline-block rounded border px-2 py-0.5 bg-violet-100 text-violet-900 border-violet-300 dark:bg-violet-700 dark:text-white dark:border-violet-500">
+              <span className="inline-block rounded border border-violet-500 bg-violet-700 px-2 py-0.5 text-white">
                 Confidence: {confidencePct}%
               </span>
             </div>
@@ -159,7 +187,7 @@ export default function ResultCard({ data }: { data?: ApiLike | null }) {
         </div>
 
         {/* progress */}
-        <div className="mt-3 h-2 w-full rounded bg-slate-200 dark:bg-slate-700">
+        <div className="mt-3 h-2 w-full rounded bg-slate-700">
           <div
             className={cx(
               "h-2 rounded bg-emerald-500 transition-all",
@@ -174,21 +202,13 @@ export default function ResultCard({ data }: { data?: ApiLike | null }) {
       <CardContent>
         {/* --- TABS: always visible + high contrast --- */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
-          <TabsList
-            className="
-              inline-flex gap-1 rounded-lg border p-1
-              bg-white/90 text-slate-700 shadow-sm
-              dark:bg-slate-700/70 dark:text-slate-200 dark:border-slate-600
-            "
-          >
+          <TabsList className="inline-flex gap-1 rounded-lg border border-slate-700 bg-slate-900/80 p-1 text-slate-200 shadow-sm">
             <TabsTrigger
               value="table"
               className="
                 rounded-md px-3 py-1 text-sm font-medium outline-none transition
-                hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400/60
-                data-[state=active]:bg-slate-900 data-[state=active]:text-white
-                dark:hover:text-white dark:focus-visible:ring-white/40
-                dark:data-[state=active]:bg-white dark:data-[state=active]:text-slate-900
+                hover:text-white focus-visible:ring-2 focus-visible:ring-white/40
+                data-[state=active]:bg-slate-800 data-[state=active]:text-white
               "
             >
               Summary
@@ -198,10 +218,8 @@ export default function ResultCard({ data }: { data?: ApiLike | null }) {
               value="json"
               className="
                 rounded-md px-3 py-1 text-sm font-medium outline-none transition
-                hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400/60
-                data-[state=active]:bg-slate-900 data-[state=active]:text-white
-                dark:hover:text-white dark:focus-visible:ring-white/40
-                dark:data-[state=active]:bg-white dark:data-[state=active]:text-slate-900
+                hover:text-white focus-visible:ring-2 focus-visible:ring-white/40
+                data-[state=active]:bg-slate-800 data-[state=active]:text-white
               "
             >
               JSON
@@ -212,10 +230,8 @@ export default function ResultCard({ data }: { data?: ApiLike | null }) {
               disabled={!data?.diagnostics?.raw_text_preview}
               className="
                 rounded-md px-3 py-1 text-sm font-medium outline-none transition
-                hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400/60
-                data-[state=active]:bg-slate-900 data-[state=active]:text-white
-                dark:hover:text-white dark:focus-visible:ring-white/40
-                dark:data-[state=active]:bg-white dark:data-[state=active]:text-slate-900
+                hover:text-white focus-visible:ring-2 focus-visible:ring-white/40
+                data-[state=active]:bg-slate-800 data-[state=active]:text-white
                 disabled:opacity-50 disabled:cursor-not-allowed
               "
             >
@@ -226,7 +242,7 @@ export default function ResultCard({ data }: { data?: ApiLike | null }) {
           {/* SUMMARY */}
           <TabsContent value="table" className="space-y-8 pt-4">
             <section>
-              <h3 className="mb-3 text-sm font-semibold text-slate-800 dark:text-slate-100">
+              <h3 className="mb-3 text-sm font-semibold text-slate-100">
                 Allergens
               </h3>
               {Object.keys(allergens).length ? (
@@ -244,17 +260,17 @@ export default function ResultCard({ data }: { data?: ApiLike | null }) {
                         {String((v?.status ?? "unknown")).toUpperCase()}
                       </span>
                     </span>
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-xs text-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600">
-                  No allergen entries found in this document.
-                </div>
-              )}
-            </section>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-md border border-slate-600 bg-slate-800 px-3 py-2 text-xs text-slate-200">
+                No allergen entries found in this document.
+              </div>
+            )}
+          </section>
 
-            <section className="space-y-4">
-              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+          <section className="space-y-4">
+              <h3 className="text-sm font-semibold text-slate-100">
                 Nutrition (per 100g)
               </h3>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -272,28 +288,20 @@ export default function ResultCard({ data }: { data?: ApiLike | null }) {
                 ))}
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <tbody>
-                    <tr className="border-y dark:border-slate-700">
-                      <td className="p-2 text-slate-600 dark:text-slate-300">Energy (kcal)</td>
-                      <td className="p-2 font-medium text-slate-900 dark:text-slate-100">
-                        {nutrition.energy?.kcal ?? "—"} kcal
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              {nutrition.notes && (
-                <p className="text-xs text-slate-700 dark:text-slate-300">{nutrition.notes}</p>
+              {notes.length > 0 && (
+                <div className="rounded-xl border border-slate-700 bg-slate-800/70 p-3 text-xs text-slate-200">
+                  {notes.map((note, idx) => (
+                    <p key={idx} className="leading-relaxed">{note}</p>
+                  ))}
+                </div>
               )}
+
             </section>
           </TabsContent>
 
           {/* JSON */}
           <TabsContent value="json" className="pt-4">
-            <ScrollArea className="h-60 sm:h-80 rounded border p-3 bg-[#0d1117] text-[#c9d1d9] dark:border-slate-700">
+            <ScrollArea className="h-60 sm:h-80 rounded border border-slate-700 bg-[#0d1117] p-3 text-[#c9d1d9]">
               <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed select-text">
                 {JSON.stringify(data, null, 2)}
               </pre>
@@ -303,13 +311,13 @@ export default function ResultCard({ data }: { data?: ApiLike | null }) {
           {/* PREVIEW */}
           <TabsContent value="preview" className="pt-4">
             {data?.diagnostics?.raw_text_preview ? (
-              <ScrollArea className="h-60 sm:h-80 rounded border p-3 bg-[#0d1117] text-[#c9d1d9] dark:border-slate-700">
+              <ScrollArea className="h-60 sm:h-80 rounded border border-slate-700 bg-[#0d1117] p-3 text-[#c9d1d9]">
                 <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed select-text">
                   {data.diagnostics.raw_text_preview}
                 </pre>
               </ScrollArea>
             ) : (
-              <p className="text-sm text-slate-600 dark:text-slate-300">No preview available.</p>
+              <p className="text-sm text-slate-400">No preview available.</p>
             )}
           </TabsContent>
         </Tabs>
@@ -319,6 +327,17 @@ export default function ResultCard({ data }: { data?: ApiLike | null }) {
 }
 
 /* utils */
-function fmtG(v: number | null | undefined) {
-  return typeof v === "number" ? `${v} g` : "—";
+function fmtG(v: NutrientValue | undefined) {
+  return fmtUnit(v, "g") ?? "—";
+}
+
+function fmtUnit(value: NutrientValue | undefined, unit: string): string | null {
+  if (typeof value === "number") {
+    const formatted = Number.isInteger(value) ? value.toString() : value.toFixed(2).replace(/\.00$/, "");
+    return `${formatted} ${unit}`;
+  }
+  if (typeof value === "string" && value.trim().length > 0) {
+    return `${value} ${unit}`;
+  }
+  return null;
 }
