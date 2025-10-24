@@ -242,6 +242,17 @@ async def extract(file: UploadFile = File(...)):
             warnings.append("No explicit allergen statements detected.")
 
         extras_data: Dict[str, Any] = {}
+        optional_fields = ["collagen_g", "water_g"]
+        for field in optional_fields:
+            value = nutrition_values.get(field)
+            if value is None:
+                continue
+            extras_data[field] = {
+                "value": value,
+                "evidence": nutrition_evidence.get(field),
+            }
+            nutrition_values.pop(field, None)
+            nutrition_evidence.pop(field, None)
         notes: list[str] = []
         if nutrition_note:
             notes.append(nutrition_note)

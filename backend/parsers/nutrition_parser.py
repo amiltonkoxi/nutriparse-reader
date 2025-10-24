@@ -21,7 +21,7 @@ def _to_float(s: str | None) -> Optional[float]:
         return None
 
 def _iter_numeric_candidates(label: str, text: str) -> Iterable[Tuple[str, Optional[str], bool, int, int, int, int, str]]:
-    """Gera pares (valor, unidade) próximos ao rótulo solicitado."""
+    """Yield candidate (value, unit) pairs located near the requested label."""
     label_regex = re.compile(rf"(?<![a-z0-9])({label})(?![a-z0-9])", re.IGNORECASE)
     value_regex = re.compile(r"(-|[0-9]+(?:[.,][0-9]+)?)(?:\s*(g|mg))?", re.IGNORECASE)
 
@@ -92,10 +92,7 @@ def _detect_operator(context_before: str, context_after: str) -> Optional[str]:
 
 
 def _extract_line_range(label: str, text: str, convert_mg: bool = True) -> Tuple[Optional[Union[float, str]], Optional[str]]:
-    """
-    Detecta linhas de tabela em que valores mínimo/máximo aparecem em colunas fixas.
-    Retorna tupla (valor, evidência).
-    """
+    """Detect table rows with min/max values and return the derived value and snippet."""
     pattern = re.compile(label, re.I)
     for line in text.split("\n"):
         match = pattern.search(line)
@@ -246,9 +243,7 @@ def _match_value(
     convert_mg: bool = True,
     dash_to_zero: bool = False,
 ) -> Tuple[Union[Optional[float], str], Optional[str]]:
-    """
-    Retorna o primeiro número válido associado ao rótulo, preservando operadores (>=, <=) quando presentes.
-    """
+    """Return the first numeric token bound to the label, keeping >= or <= operators when present."""
     fallback_range = None
     line_value, line_evidence = _extract_line_range(label, text, convert_mg=convert_mg)
     if line_value is not None:
@@ -341,9 +336,7 @@ def _within_bounds(key: str, value: Union[float, str, None]) -> Union[float, str
     return value
 
 def _extract_energy(text: str) -> Dict[str, Optional[float]]:
-    """
-    Extrai '1982 kJ / 479 kcal' mesmo com espaços quebrados.
-    """
+    """Extract pairs such as '1982 kJ / 479 kcal' even when spacing is messy."""
     kj = kcal = None
     evidence_kj = evidence_kcal = None
     m = re.search(r"([0-9]+(?:[.,][0-9]+)?)\s*k[jJ]\s*[/|,]?\s*([0-9]+(?:[.,][0-9]+)?)\s*kcal", text)
@@ -398,9 +391,7 @@ def _match_saturated(text: str) -> Tuple[Optional[float], Optional[str]]:
 
 # -------- main --------
 def parse_nutrition(raw_text: str) -> Tuple[Dict[str, Union[float, str, None]], Dict[str, Optional[str]], Optional[str]]:
-    """
-    Suporta texto húngaro e OCR com ruído.
-    """
+    """Parse nutrition panels in Hungarian/English text and noisy OCR output."""
     t = _clean(raw_text)
     raw_lines = raw_text.splitlines()
 

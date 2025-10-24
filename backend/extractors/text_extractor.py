@@ -10,11 +10,11 @@ from unidecode import unidecode
 def _normalize(text: str) -> str:
     if not text:
         return ""
-    text = re.sub(r"(\w)-\s*\n\s*(\w)", r"\1\2", text)     # de-hifenizar
+    text = re.sub(r"(\w)-\s*\n\s*(\w)", r"\1\2", text)     # glue hyphenated wraps
     text = text.replace("\r", "\n")
     text = re.sub(r"[ \t]+", " ", text)
     text = re.sub(r"\n{2,}", "\n", text)
-    text = re.sub(r"(\d),(\d)", r"\1.\2", text)            # vírgula decimal → ponto
+    text = re.sub(r"(\d),(\d)", r"\1.\2", text)            # normalize decimal comma
     text = unidecode(text).lower()
     return text.strip()
 
@@ -58,9 +58,7 @@ def _extract_with_pdfium(pdf_path: str) -> str:
 
 
 def extract_text(pdf_path: str) -> str:
-    """
-    Tenta PyPDFium2 primeiro (melhor layout), volta ao pdfplumber se necessário.
-    """
+    """Try PyPDFium2 first for layout fidelity, fall back to pdfplumber."""
     raw_pdfium = _extract_with_pdfium(pdf_path)
     raw_plumber = _extract_with_pdfplumber(pdf_path)
 

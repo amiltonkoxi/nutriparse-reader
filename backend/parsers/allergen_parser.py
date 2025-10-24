@@ -48,9 +48,7 @@ def _update_status(
 
 @lru_cache(maxsize=1)
 def _load_rules() -> Tuple[Dict[str, Dict[str, list[re.Pattern]]], Dict[str, list[re.Pattern]]]:
-    """
-    Carrega e compila os padrões de alergênicos declarados em /rules/allergens.json.
-    """
+    """Load and compile allergen patterns declared in rules/allergens.json."""
     rules_path = Path(__file__).resolve().parent.parent / "rules" / "allergens.json"
     with rules_path.open(encoding="utf-8") as fh:
         raw = json.load(fh)
@@ -81,9 +79,7 @@ def _normalize(text: str | None) -> str:
 
 
 def _scan_table(text: str) -> Dict[str, Dict[str, Any]]:
-    """
-    Detecta tabelas com marcações I/N/X (Igen/Nem/Keresztszennyeződés).
-    """
+    """Detect tables that use I/N/X style markings (Igen/Nem/trace)."""
     labels = {
         "gluten": ("gluten",),
         "egg": ("tojas", "egg"),
@@ -299,9 +295,7 @@ def _apply_rule_patterns(
 
 
 def parse_allergens(text: str) -> Allergen:
-    """
-    Combina heurísticas de tabela (I/N/X) com um dicionário de padrões por alergênico.
-    """
+    """Combine table heuristics with per-allergen pattern dictionaries."""
     rules, global_rules = _load_rules()
     normalized = _normalize(text)
 
@@ -311,13 +305,13 @@ def parse_allergens(text: str) -> Allergen:
     _apply_ingredient_fallback(text, out)
     _apply_trace_sentences(text, out)
 
-    # Primeiro: tabelas explícitas com marcações I/N/X.
+    # First: explicit I/N/X table rows.
     normalized_no_colon = normalized.replace(":", " ")
     table_hits = _scan_table(normalized_no_colon)
     for key, value in table_hits.items():
         _update_status(out, key, value.get("status", "unknown"), value.get("evidence"))
 
-    # Declarações globais tipo "allergen anyagokat nem tartalmaz".
+    # Global statements such as "allergen anyagokat nem tartalmaz".
     no_allergen_match = None
     for pat in global_rules.get("no_allergens", []):
         match = pat.search(normalized)
@@ -337,7 +331,7 @@ def parse_allergens(text: str) -> Allergen:
             out["fish"] = {"status": "contains", "evidence": snippet}
             break
 
-    # Em seguida, aplicar padrões por alergênico onde ainda há dúvida.
+    # Next, run pattern rules for allergens still marked as unknown.
     for allergen in list(out.keys()):
         if out[allergen]["status"] != "unknown":
             continue
