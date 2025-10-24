@@ -3,9 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 import os, tempfile
 
 # Local modules
-from extractors.text_extractor import extract_text, parse_nutrition
+from extractors.text_extractor import extract_text
 from extractors.ocr_extractor import ocr_extract
 from parsers.allergen_parser import parse_allergens
+from parsers.nutrition_parser import parse_nutrition
 
 # --- App setup ---
 app = FastAPI(title="NutriParse Reader API", version="0.2.1")
@@ -41,7 +42,7 @@ async def extract(file: UploadFile = File(...)):
 
         # 2) Parse sections
         allergens = parse_allergens(text)
-        nutrition = parse_nutrition(text)  # <-- new nutrition parser
+        nutrition_values, nutrition_evidence, nutrition_note = parse_nutrition(text)
 
         # 3) Return structured JSON (API contract stable)
         return {
@@ -54,16 +55,14 @@ async def extract(file: UploadFile = File(...)):
                 "confidence": 0.75 if mode == "text" else 0.60,
             },
             "allergens": allergens,
-            "nutrition": nutrition,
-            "extras": {
-                "saturated_fat_g": None,
-                "water_g": None,
-                "collagen_g": None,
-            },
+            "nutrition_per_100g": nutrition_values,
+            "extras": {},
             "diagnostics": {
                 "warnings": [],
                 "pages_scanned": 0,
-                "raw_text_preview": (text[:4000] if text else None),
+                "raw_text_preview": (text[:2000] if text else ""),
+                "nutrition_evidence": nutrition_evidence,
+                "notes": ([nutrition_note] if nutrition_note else None),
             },
         }
 
