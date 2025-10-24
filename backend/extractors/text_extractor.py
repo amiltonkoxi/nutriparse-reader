@@ -1,47 +1,81 @@
 from __future__ import annotations
+
 import re
-from typing import Dict, Any
-from io import BytesIO
+from typing import List
 
 import pdfplumber
-from rules.regex_patterns import NUTRITION_PATTERNS
+import pypdfium2 as pdfium
+from unidecode import unidecode
 
-__all__ = ["extract_text_from_pdf", "parse_nutrition"]
+def _normalize(text: str) -> str:
+    if not text:
+        return ""
+    text = re.sub(r"(\w)-\s*\n\s*(\w)", r"\1\2", text)     # de-hifenizar
+    text = text.replace("\r", "\n")
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n{2,}", "\n", text)
+    text = re.sub(r"(\d),(\d)", r"\1.\2", text)            # vírgula decimal → ponto
+    text = unidecode(text).lower()
+    return text.strip()
 
-# -----------------------------
-# Text extraction (PDF -> text)
-# -----------------------------
-def extract_text_from_pdf(path_or_bytes) -> str:
-    """
-    Extract selectable text from a PDF (no OCR).
-    Accepts a file path or raw bytes/bytearray.
-    """
-    if isinstance(path_or_bytes, (bytes, bytearray)):
-        bio = BytesIO(path_or_bytes)
-        with pdfplumber.open(bio) as pdf:
-            parts = [(p.extract_text() or "") for p in pdf.pages]
-        return "\n".join(parts)
-    else:
-        with pdfplumber.open(path_or_bytes) as pdf:
-            parts = [(p.extract_text() or "") for p in pdf.pages]
-        return "\n".join(parts)
 
-# ------------------------------------------------
-# Nutrition parser (HU/EN) + tolerant fallbacks
-# ------------------------------------------------
-_COMPILED: Dict[str, re.Pattern[str]] = {
-    k: re.compile(v, re.IGNORECASE | re.DOTALL) for k, v in NUTRITION_PATTERNS.items()
-}
-
-def _to_float(v: str | None) -> float | None:
-    if not v:
-        return None
+def _extract_with_pdfplumber(pdf_path: str) -> str:
+    chunks: List[str] = []
     try:
-        return float(v.replace(",", "."))
-    except ValueError:
-        return None
+        with pdfplumber.open(pdf_path) as pdf:
+            for p in pdf.pages:
+                t = p.extract_text() or ""
+                if t:
+                    chunks.append(t)
+    except Exception:
+        return ""
+    return "\n".join(chunks)
 
-# ... imports and helpers unchanged ...
+
+def _extract_with_pdfium(pdf_path: str) -> str:
+    try:
+        doc = pdfium.PdfDocument(pdf_path)
+    except Exception:
+        return ""
+
+    texts: List[str] = []
+    try:
+        for index in range(len(doc)):
+            page = doc.get_page(index)
+            try:
+                textpage = page.get_textpage()
+                try:
+                    snippet = textpage.get_text_range() or ""
+                    if snippet:
+                        texts.append(snippet)
+                finally:
+                    textpage.close()
+            finally:
+                page.close()
+    finally:
+        doc.close()
+    return "\n".join(texts)
+
+
+def extract_text(pdf_path: str) -> str:
+    """
+    Tenta PyPDFium2 primeiro (melhor layout), volta ao pdfplumber se necessário.
+    """
+    raw_pdfium = _extract_with_pdfium(pdf_path)
+    raw_plumber = _extract_with_pdfplumber(pdf_path)
+
+    if raw_pdfium and raw_plumber:
+        if raw_plumber in raw_pdfium:
+            raw = raw_pdfium
+        elif raw_pdfium in raw_plumber:
+            raw = raw_plumber
+        else:
+            raw = f"{raw_pdfium}\n\n{raw_plumber}"
+    else:
+        raw = raw_pdfium or raw_plumber
+
+    return _normalize(raw)
+
 
 def parse_nutrition(raw_text: str) -> Dict[str, Any]:
     out: Dict[str, Any] = {

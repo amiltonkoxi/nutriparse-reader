@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import os, tempfile
 
 # Local modules
-from extractors.text_extractor import extract_text_from_pdf, parse_nutrition
-from extractors.ocr_extractor import extract_text_via_ocr
+from extractors.text_extractor import extract_text, parse_nutrition
+from extractors.ocr_extractor import ocr_extract
 from parsers.allergen_parser import parse_allergens
 
 # --- App setup ---
@@ -33,11 +33,11 @@ async def extract(file: UploadFile = File(...)):
 
     try:
         # 1) Try text extraction first; fallback to OCR if empty
-        text = extract_text_from_pdf(tmp_path) or ""
+        text = extract_text(tmp_path) or ""
         mode = "text"
         if len(text.strip()) < 80:
             mode = "ocr"
-            text = extract_text_via_ocr(tmp_path) or ""
+            text = ocr_extract(tmp_path) or ""
 
         # 2) Parse sections
         allergens = parse_allergens(text)

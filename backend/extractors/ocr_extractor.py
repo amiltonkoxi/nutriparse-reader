@@ -1,20 +1,35 @@
-# legend: OCR fallback using pdf2image + Tesseract (with progress prints).
-
+from __future__ import annotations
+from typing import List
+import re
 from pdf2image import convert_from_path
+from PIL import Image, ImageOps, ImageFilter
 import pytesseract
-import tempfile
+from unidecode import unidecode
 
-def extract_text_via_ocr(path: str, lang: str = "eng+hun+pol") -> str:
-    """
-    Convert PDF pages to images and OCR them with Tesseract.
-    Uses dpi=200 to keep it reasonably fast.
-    """
-    chunks = []
-    with tempfile.TemporaryDirectory() as tmpdir:
-        images = convert_from_path(path, output_folder=tmpdir, fmt="png", dpi=200)
-        total = len(images)
-        for i, img in enumerate(images, 1):
-            print(f"[OCR] Processing page {i}/{total}…")
-            chunks.append(f"\n--- page {i} ---\n")
-            chunks.append(pytesseract.image_to_string(img, lang=lang))
-    return "".join(chunks).strip()
+def _preprocess(img: Image.Image) -> Image.Image:
+    img = ImageOps.grayscale(img)
+    img = ImageOps.autocontrast(img)
+    img = img.filter(ImageFilter.UnsharpMask(radius=1, percent=80, threshold=3))
+    img = img.point(lambda x: 255 if x > 180 else 0)
+    return img
+
+def _normalize(text: str) -> str:
+    if not text:
+        return ""
+    text = re.sub(r"(\w)-\s*\n\s*(\w)", r"\1\2", text)
+    text = text.replace("\r", "\n")
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n{2,}", "\n", text)
+    text = re.sub(r"(\d),(\d)", r"\1.\2", text)
+    text = unidecode(text).lower()
+    return text.strip()
+
+def ocr_extract(pdf_path: str, dpi: int = 300) -> str:
+    pages: List[Image.Image] = convert_from_path(pdf_path, dpi=dpi)
+    texts: List[str] = []
+    for img in pages:
+        imgp = _preprocess(img)
+        t = pytesseract.image_to_string(imgp, lang="eng+hun+pol")
+        if t:
+            texts.append(t)
+    return _normalize("\n".join(texts))
