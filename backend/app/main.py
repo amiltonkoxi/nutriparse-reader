@@ -162,15 +162,23 @@ def compute_confidence(meta, allergens, nutrition):
 
 app = FastAPI(title="NutriParse Reader API", version="0.3.1")
 
-# Allow requests from the deployed Vercel frontend and local preview.
-_allowed_origins = os.getenv("ALLOWED_ORIGINS", "https://nutriparse-reader.vercel.app,http://localhost:3000")
+# --- CORS config ---
+_allowed_origins = os.getenv(
+    "ALLOWED_ORIGINS",
+    "https://nutriparsereader.vercel.app,http://localhost:3000"
+)
 ALLOWED_ORIGINS = [origin.strip() for origin in _allowed_origins.split(",") if origin.strip()]
+ALLOWED_ORIGIN_REGEX = os.getenv("ALLOWED_ORIGIN_REGEX", r"^https://.*vercel\.app$")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=ALLOWED_ORIGIN_REGEX,
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=True,
 )
+# --- end CORS config ---
 
 @app.get("/health")
 def health():
