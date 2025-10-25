@@ -8,18 +8,18 @@
 
 ## Project Overview
 
-NutriParse Reader is a full-stack web application that automatically extracts allergen statements and nutrition facts from food product PDFs. Both digitally generated PDFs and scanned/image-based PDFs are supported. The backend uses AI-augmented parsing (rule-based extraction with LLM assistance) to detect allergens and nutrition values, while the frontend presents the results in both table and JSON formats for quick review.
+NutriParse Reader is a full-stack web application that extracts allergen statements and nutrition facts from food product PDFs. It supports both digitally generated PDFs and scanned/image-based PDFs. The backend uses AI-augmented parsing (rule-based extraction with LLM assistance) to detect allergens and nutrition values, while the frontend presents the results in both table and JSON formats for quick review.
 
 ---
 
 ## Features
 
 - Upload up to **two PDFs per run** using drag and drop or a file picker.
-- Backend processing with AI/LLM logic to interpret ingredient statements and nutrition tables.
+- Process PDFs through AI/LLM-assisted logic to interpret ingredient statements and nutrition tables.
 - Extraction of the **10 required allergens**: Gluten, Egg, Crustaceans, Fish, Peanut, Soy, Milk, Tree nuts, Celery, Mustard.
-- Extraction of the **6 nutrition values**: Energy, Fat, Carbohydrate, Sugar, Protein, Sodium.
-- Structured output in a responsive **table view** plus a raw **JSON view**.
-- Automatic **OCR fallback** for scanned or photo-based PDFs.
+- Extract the six nutrition values: Energy, Fat, Carbohydrate, Sugar, Protein, Sodium.
+- Present structured output in a responsive table view and raw JSON view.
+- Automatic OCR fallback for scanned or photo-based PDFs.
 
 ---
 
@@ -74,7 +74,7 @@ NutriParse Reader is a full-stack web application that automatically extracts al
 
 ## Deployment
 
-NutriParse Reader runs with a split deployment: the backend is hosted on Render, and the frontend is served by Vercel.
+NutriParse Reader runs with a split deployment: the backend is hosted on Render and the frontend on Vercel.
 
 - **Backend:** https://nutriparse-reader-1.onrender.com  
 - **Frontend:** https://nutriparsereader.vercel.app
@@ -98,9 +98,19 @@ Environment variables:
 
 ## Demo Video
 
-Watch a short demonstration of NutriParse Reader in action:  
-[![Demo Video](image/result.png)](image/Live_test.MOV)
-*Consider replacing the thumbnail with a representative frame from the demo if available.*
+Watch a short demonstration of NutriParse Reader in action (MP4 recommended for browser playback):
+[![Demo Video](image/result.png)](image/live-demo.mp4)
+*Tip: capture a representative frame from the video and save it as `image/result.png` or a dedicated thumbnail.*
+
+If the recording remains in MOV format, convert it before committing:
+```bash
+ffmpeg -i image/Live_test.MOV -vcodec libx264 -crf 23 -preset medium -acodec aac -movflags +faststart image/live-demo.mp4
+```
+Add the converted video so the link above stays valid:
+```bash
+git add image/live-demo.mp4
+```
+
 
 ---
 
@@ -108,10 +118,10 @@ Watch a short demonstration of NutriParse Reader in action:
 
 | Assignment Deliverable | Status |
 |------------------------|--------|
-| Source code            | ✔️ Completed in this repository (frontend and backend). |
-| Documentation          | ✔️ Completed project overview and technical guides in this README. |
-| Demonstration video    | ✔️ Completed in the “Demo Video” section. |
-| Live deployment URL    | ✔️ Completed Render and Vercel links listed in “Deployment”. |
+| Source code            | ✔️ Completed |
+| Documentation          | ✔️ Completed |
+| Demonstration video    | ✔️ Completed |
+| Live deployment URL    | ✔️ Completed |
 
 ---
 
