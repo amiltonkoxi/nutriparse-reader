@@ -14,7 +14,7 @@ NutriParse Reader is a full-stack web application that automatically extracts al
 
 ## Features
 
-- Upload up to **two PDFs per run** using drag & drop or a file picker.
+- Upload up to **two PDFs per run** using drag and drop or a file picker.
 - Backend processing with AI/LLM logic to interpret ingredient statements and nutrition tables.
 - Extraction of the **10 required allergens**: Gluten, Egg, Crustaceans, Fish, Peanut, Soy, Milk, Tree nuts, Celery, Mustard.
 - Extraction of the **6 nutrition values**: Energy, Fat, Carbohydrate, Sugar, Protein, Sodium.
@@ -34,7 +34,7 @@ NutriParse Reader is a full-stack web application that automatically extracts al
 
 ---
 
-## Installation & Usage
+## Installation and Usage
 
 1. **Clone the repository**
    ```bash
@@ -68,7 +68,7 @@ NutriParse Reader is a full-stack web application that automatically extracts al
    ```
 
 6. **Open the app**
-Visit `http://localhost:3000` in your browser, select up to two PDFs, and inspect the extracted data.
+   Visit `http://localhost:3000` in your browser, upload up to two PDFs, and inspect the extracted data.
 
 ---
 
@@ -81,8 +81,8 @@ NutriParse Reader runs with a split deployment: the backend is hosted on Render,
 
 Environment variables:
 
-- **Render:** set `ALLOWED_ORIGINS` to `https://nutriparsereader.vercel.app,http://localhost:3000` so CORS covers production and local development.  
-- **Vercel:** set `NEXT_PUBLIC_API_BASE` to the Render backend URL so client requests go to the deployed API.
+- **Render:** `ALLOWED_ORIGINS=https://nutriparsereader.vercel.app,http://localhost:3000`
+- **Vercel:** `NEXT_PUBLIC_API_BASE=https://nutriparse-reader-1.onrender.com`
 
 ---
 
@@ -90,9 +90,17 @@ Environment variables:
 
 | Preview | Description |
 |---------|-------------|
-| ![Homepage](image/Dark.png) | **Homepage (dark theme)** showing upload panel, queue, and action buttons. |
-| ![File Drop](image/filedrop.png) | **Dropping PDFs** – drag & drop interaction with two documents selected. |
-| ![Extraction Result](image/result.png) | **Extraction view** – tabbed table/JSON results, confidence, and evidence. |
+| ![Homepage](image/Dark.png) | Homepage with upload panel and queue. |
+| ![File Drop](image/filedrop.png) | Drag and drop queue with two files selected. |
+| ![Extraction Result](image/result.png) | Extraction results with summary, JSON, and preview tabs. |
+
+---
+
+## Demo Video
+
+Watch a short demonstration of NutriParse Reader in action:  
+[![Demo Video](image/result.png)](image/Live_test.MOV)
+*Consider replacing the thumbnail with a representative frame from the demo if available.*
 
 ---
 
@@ -100,14 +108,14 @@ Environment variables:
 
 | Assignment Deliverable | Status |
 |------------------------|--------|
-| Source code            | ✅ Included in this repository (frontend + backend). |
-| Documentation          | ✅ This README provides setup, architecture, and usage details. |
-| Demonstration video    | 🔧 *To be added.* Recording will showcase upload and extraction flow. |
-| Live deployment URL    | 🔧 *To be added.* Hosted version will be linked once deployed. |
+| Source code            | ✔️ Completed in this repository (frontend and backend). |
+| Documentation          | ✔️ Completed project overview and technical guides in this README. |
+| Demonstration video    | ✔️ Completed in the “Demo Video” section. |
+| Live deployment URL    | ✔️ Completed Render and Vercel links listed in “Deployment”. |
 
 ---
 
-## Testing & Contribution
+## Testing and Contribution
 
 If pytest is installed inside the backend virtual environment, activate the venv and run:
 
@@ -154,10 +162,17 @@ User → Vercel Frontend (Next.js) → Render Backend (FastAPI)
 
 ---
 
+## Documentation
+
+- [Developer Guide](docs/Developer%20Guide.pdf)
+- [User Guide](docs/User%20Guide.pdf)
+
+---
+
 ## License & Acknowledgments
 
 - **License:** MIT License — see `LICENSE`.
-- **Acknowledgment:** This project implements the developer assignment described by **Dr. Tamás Bérczes** (University of Debrecen, 2025). Many thanks for the detailed specification and guidance.
+- **Acknowledgment:** This project was developed as part of the developer assignment supervised by Dr. Tamás Bérczes, University of Debrecen (2025).
 
 ---
 
