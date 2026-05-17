@@ -182,7 +182,6 @@ User → Vercel Frontend (Next.js) → Render Backend (FastAPI)
 ## License & Acknowledgments
 
 - **License:** MIT License — see `LICENSE`.
-- **Acknowledgment:** This project was developed as part of the developer assignment supervised by Dr. Tamás Bérczes, University of Debrecen (2025).
 
 ---
 
