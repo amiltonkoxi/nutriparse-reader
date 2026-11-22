@@ -1,8 +1,10 @@
 from __future__ import annotations
+
 import re
-from math import isnan
-from typing import Dict, Any, Optional, Iterable, Tuple, Union
+from collections.abc import Iterable
+
 from unidecode import unidecode
+
 
 # -------- utils --------
 def _clean(text: str) -> str:
@@ -12,7 +14,7 @@ def _clean(text: str) -> str:
     t = re.sub(r"\n{2,}", "\n", t)
     return t
 
-def _to_float(s: str | None) -> Optional[float]:
+def _to_float(s: str | None) -> float | None:
     if not s:
         return None
     try:
@@ -20,7 +22,7 @@ def _to_float(s: str | None) -> Optional[float]:
     except Exception:
         return None
 
-def _iter_numeric_candidates(label: str, text: str) -> Iterable[Tuple[str, Optional[str], bool, int, int, int, int, str]]:
+def _iter_numeric_candidates(label: str, text: str) -> Iterable[tuple[str, str | None, bool, int, int, int, int, str]]:
     """Yield candidate (value, unit) pairs located near the requested label."""
     label_regex = re.compile(rf"(?<![a-z0-9])({label})(?![a-z0-9])", re.IGNORECASE)
     value_regex = re.compile(r"(-|[0-9]+(?:[.,][0-9]+)?)(?:\s*(g|mg))?", re.IGNORECASE)
@@ -103,7 +105,7 @@ def _format_operator_value(value: float, operator: str) -> str:
     return f"{operator}{_format_number(value)}"
 
 
-def _detect_operator(context_before: str, context_after: str) -> Optional[str]:
+def _detect_operator(context_before: str, context_after: str) -> str | None:
     window = (context_before[-60:] + " " + context_after[:40]).lower()
     for reg in _GE_REGEXES:
         if reg.search(window):
@@ -114,7 +116,7 @@ def _detect_operator(context_before: str, context_after: str) -> Optional[str]:
     return None
 
 
-def _extract_line_range(label: str, text: str, convert_mg: bool = True) -> Tuple[Optional[Union[float, str]], Optional[str]]:
+def _extract_line_range(label: str, text: str, convert_mg: bool = True) -> tuple[float | str | None, str | None]:
     """Detect table rows with min/max values and return the derived value and snippet."""
     pattern = re.compile(label, re.I)
     for line in text.split("\n"):
@@ -159,12 +161,12 @@ def _match_line_value(
     label_terms: Iterable[str],
     raw_lines: Iterable[str],
     *,
-    units: Tuple[str, ...] = ("g", "mg"),
+    units: tuple[str, ...] = ("g", "mg"),
     convert_mg: bool = True,
-    bounds: Optional[Tuple[float, float]] = None,
+    bounds: tuple[float, float] | None = None,
     dash_to_zero: bool = False,
-    exclude_terms: Optional[Tuple[str, ...]] = None,
-) -> Tuple[Optional[float], Optional[str]]:
+    exclude_terms: tuple[str, ...] | None = None,
+) -> tuple[float | None, str | None]:
     def _term_present(norm_line: str, term: str) -> bool:
         term = term.strip().lower()
         if not term:
@@ -186,7 +188,7 @@ def _match_line_value(
         if not label_positions:
             continue
         label_pos = min(label_positions)
-        best: Optional[Tuple[int, int, bool, float, str]] = None
+        best: tuple[int, int, bool, float, str] | None = None
         for match in re.finditer(r"([0-9]+(?:[.,][0-9]+)?)", combined):
             value = _to_float(match.group(1))
             if value is None:
@@ -239,8 +241,8 @@ def _match_line_value(
 
 def _detect_serving_basis(
     raw_text: str,
-    values: Dict[str, Union[float, str, None]],
-) -> Tuple[Optional[str], Optional[str], bool, Optional[str]]:
+    values: dict[str, float | str | None],
+) -> tuple[str | None, str | None, bool, str | None]:
     for pattern in _SERVING_PER100_PATTERNS:
         match = pattern.search(raw_text)
         if match:
@@ -265,8 +267,8 @@ def _match_dash_line(
     label_terms: Iterable[str],
     raw_lines: Iterable[str],
     *,
-    bounds: Optional[Tuple[float, float]] = None,
-) -> Tuple[Optional[str], Optional[str]]:
+    bounds: tuple[float, float] | None = None,
+) -> tuple[str | None, str | None]:
     for line in raw_lines:
         norm = unidecode(line).lower()
         if not any(term in norm for term in label_terms):
@@ -289,7 +291,7 @@ def _match_value(
     *,
     convert_mg: bool = True,
     dash_to_zero: bool = False,
-) -> Tuple[Union[Optional[float], str], Optional[str]]:
+) -> tuple[float | None | str, str | None]:
     """Return the first numeric token bound to the label, keeping >= or <= operators when present."""
     fallback_range = None
     line_value, line_evidence = _extract_line_range(label, text, convert_mg=convert_mg)
@@ -335,15 +337,15 @@ def _match_value(
 
 
 NUTRIENT_LABELS = {
-    "fat_g": ["zsir", "zsirtartalom", "fat"],
-    "carbohydrate_g": ["szenhidrat", "carbohydrate"],
-    "sugars_g": ["cukor", "cukrok", "sugar", "sugars"],
-    "protein_g": ["feherje", "fehérje", "protein"],
-    "salt_g": ["salt", "salt/so"],
+    "fat_g": ["zsir", "zsirtartalom", "fat", "tluszcz"],
+    "carbohydrate_g": ["szenhidrat", "carbohydrate", "weglowodany"],
+    "sugars_g": ["cukor", "cukrok", "sugar", "sugars", "cukry"],
+    "protein_g": ["feherje", "fehérje", "protein", "bialko"],
+    "salt_g": ["salt", "salt/so", "sol"],
     "sodium_mg": ["natrium", "sodium"],
     "collagen_g": ["kolagen", "kollagen", "collagen"],
     "water_g": ["viz", "water", "woda"],
-    "saturated_fat_g": ["telitett", "kwasy nasycone", "saturated", "saturates", "gesattigte"],
+    "saturated_fat_g": ["telitett", "kwasy nasycone", "kwasy tluszczowe nasycone", "saturated", "saturates", "gesattigte"],
 }
 
 NUTRIENT_EXCLUDES = {
@@ -382,7 +384,7 @@ NUTRIENT_BOUNDS = {
 }
 
 
-def _within_bounds(key: str, value: Union[float, str, None]) -> Union[float, str, None]:
+def _within_bounds(key: str, value: float | str | None) -> float | str | None:
     if value is None:
         return None
     bounds = NUTRIENT_BOUNDS.get(key)
@@ -400,7 +402,7 @@ def _within_bounds(key: str, value: Union[float, str, None]) -> Union[float, str
         return None
     return value
 
-def _extract_energy(text: str) -> Dict[str, Optional[float]]:
+def _extract_energy(text: str) -> dict[str, float | None]:
     """Extract pairs such as '1982 kJ / 479 kcal' even when spacing is messy."""
     kj = kcal = None
     evidence_kj = evidence_kcal = None
@@ -437,14 +439,14 @@ def _extract_energy(text: str) -> Dict[str, Optional[float]]:
 
 _SATURATED_PATTERNS = [
     r"amelyb[őo]l\s+tel[ií]tett\s+zs[ií]rsav(?:ak)?\s*[:=]?\s*([0-9]+(?:[.,][0-9]+)?)\s*g?",
-    r"w\s+tym\s+kwasy\s+nasycone\s*[:=]?\s*([0-9]+(?:[.,][0-9]+)?)\s*g?",
+    r"w\s+tym\s+kwasy\s+(?:tluszczowe\s+)?nasycone\s*[:=]?\s*([0-9]+(?:[.,][0-9]+)?)\s*g?",
     r"saturated\s+fat\s*[:=]?\s*([0-9]+(?:[.,][0-9]+)?)\s*g?",
     r"davon\s+ges[aä]ttigte\s+fetts[aä]uren\s*[:=]?\s*([0-9]+(?:[.,][0-9]+)?)\s*g?",
 ]
 _SATURATED_REGEXES = [re.compile(pat, re.IGNORECASE) for pat in _SATURATED_PATTERNS]
 
 
-def _match_saturated(text: str) -> Tuple[Optional[float], Optional[str]]:
+def _match_saturated(text: str) -> tuple[float | None, str | None]:
     for pat in _SATURATED_REGEXES:
         m = pat.search(text)
         if not m:
@@ -455,17 +457,17 @@ def _match_saturated(text: str) -> Tuple[Optional[float], Optional[str]]:
     return None, None
 
 # -------- main --------
-def parse_nutrition(raw_text: str) -> Tuple[
-    Dict[str, Union[float, str, None]],
-    Dict[str, Optional[str]],
-    Optional[str],
-    Dict[str, Optional[Union[str, bool]]],
+def parse_nutrition(raw_text: str) -> tuple[
+    dict[str, float | str | None],
+    dict[str, str | None],
+    str | None,
+    dict[str, str | bool | None],
 ]:
     """Parse nutrition panels in Hungarian/English text and noisy OCR output."""
     t = _clean(raw_text)
     raw_lines = raw_text.splitlines()
 
-    values: Dict[str, Union[float, str, None]] = {
+    values: dict[str, float | str | None] = {
         "energy_kJ": None,
         "energy_kcal": None,
         "fat_g": None,
@@ -478,16 +480,16 @@ def parse_nutrition(raw_text: str) -> Tuple[
         "collagen_g": None,
         "water_g": None,
     }
-    evidence: Dict[str, Optional[str]] = {k: None for k in values}
+    evidence: dict[str, str | None] = {k: None for k in values}
     any_value = False
-    note: Optional[str] = None
+    note: str | None = None
 
     energy_vals, energy_evid = _extract_energy(t)
     for key, val in energy_vals.items():
         values[key] = val
         evidence[key] = energy_evid.get(key)
 
-    def _first_pass(key: str, *, dash=False, convert_mg=True, exclude=None) -> Tuple[Optional[float], Optional[str]]:
+    def _first_pass(key: str, *, dash=False, convert_mg=True, exclude=None) -> tuple[float | None, str | None]:
         labels = NUTRIENT_LABELS.get(key, [])
         return _match_line_value(
             labels,
@@ -500,7 +502,7 @@ def parse_nutrition(raw_text: str) -> Tuple[
 
     fat, fat_ev = _first_pass("fat_g")
     if fat is None:
-        fat, fat_ev = _match_value(r"zs[ií]r|fat", t)
+        fat, fat_ev = _match_value(r"zs[ií]r|fat|tluszcz", t)
     else:
         range_val, range_ev = _match_value(r"zs[ií]r|fat", t)
         if isinstance(range_val, str) and any(range_val.startswith(op) for op in (">=", "<=")):
@@ -508,7 +510,7 @@ def parse_nutrition(raw_text: str) -> Tuple[
 
     carbs, carbs_ev = _first_pass("carbohydrate_g")
     if carbs is None:
-        carbs, carbs_ev = _match_value(r"sz[eé]nhidr[aá]t|carbohydrate", t)
+        carbs, carbs_ev = _match_value(r"sz[eé]nhidr[aá]t|carbohydrate|weglowodany", t)
     else:
         range_val, range_ev = _match_value(r"sz[eé]nhidr[aá]t|carbohydrate", t)
         if isinstance(range_val, str) and any(range_val.startswith(op) for op in (">=", "<=")):
@@ -516,7 +518,7 @@ def parse_nutrition(raw_text: str) -> Tuple[
 
     sugar, sugar_ev = _first_pass("sugars_g")
     if sugar is None:
-        sugar, sugar_ev = _match_value(r"cukor|cukrok|sugar", t)
+        sugar, sugar_ev = _match_value(r"cukor|cukrok|sugar|cukry", t)
     else:
         range_val, range_ev = _match_value(r"cukor|cukrok|sugar", t)
         if isinstance(range_val, str) and any(range_val.startswith(op) for op in (">=", "<=")):
@@ -580,7 +582,7 @@ def parse_nutrition(raw_text: str) -> Tuple[
     if sat_fat is None:
         sat_fat, sat_ev = _match_saturated(t)
 
-    def _assign(key: str, value: Union[float, str, None], evid: Optional[str]):
+    def _assign(key: str, value: float | str | None, evid: str | None):
         nonlocal any_value
         bounded = _within_bounds(key, value)
         if bounded is None:
@@ -624,13 +626,15 @@ def parse_nutrition(raw_text: str) -> Tuple[
             values.pop(optional_key, None)
             evidence.pop(optional_key, None)
 
+    if values.get("energy_kJ") is not None or values.get("energy_kcal") is not None:
+        any_value = True
     if not any_value:
         for key in list(values.keys()):
             values[key] = None
             evidence[key] = None
         note = "No nutrition table detected"
 
-    def _normalize_numeric(key: str, value: Union[float, str, None]) -> Union[float, str, None]:
+    def _normalize_numeric(key: str, value: float | str | None) -> float | str | None:
         if value is None:
             return None
         if isinstance(value, str):
