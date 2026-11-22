@@ -65,3 +65,15 @@ jobs:
       - run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: "1"
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build API image
+        run: docker build -t nutriparse-api backend
+      - name: Smoke test
+        run: |
+          docker run -d --name api -p 8000:8000 nutriparse-api
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8000/health && break; sleep 1; done
+          curl -fsS http://127.0.0.1:8000/health | grep -q '"ocr_languages":"hun+pol+eng"'
