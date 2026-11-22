@@ -9,4 +9,8 @@ services:
     healthCheckPath: /health
     envVars:
       - key: ALLOWED_ORIGINS
-        value: https://nutriparse-reader.vercel.app,http://localhost:3000
+        value: https://nutriparsereader.vercel.app,http://localhost:3000
+      - key: NUTRIPARSE_MAX_UPLOAD_MB
+        value: "15"
+      - key: NUTRIPARSE_MAX_PAGES
+        value: "30"
