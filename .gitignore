@@ -1,42 +1,32 @@
-# ---- Python
+# Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.pytest_cache/
-*.coverage
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
 .coverage*
 dist/
 build/
+*.egg-info/
 
-# Virtualenv
-venv/
-backend/venv/
+# Data: real supplier sheets stay private; synthetic sets are regenerated
+data/
+*.ocr.txt
+evaluation/results/**/predictions.json
 
-# ---- Node / Next.js
-frontend/node_modules/
+# Node / Next.js
+node_modules/
 frontend/.next/
 frontend/out/
 
 # Env files
 .env
 .env.*
-frontend/.env*
-backend/.env*
 
-# Logs / OS / IDE
-*.log
+# OS / IDE
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
-
-# Coverage
-coverage/
-
-# Ignore env/build artifacts
-backend/.venv/
-frontend/.next/
-node_modules/
-out/
-__pycache__/
-*.pyc
+*.log

@@ -1,8 +1,0 @@
-# Ignore everything by default
-*
-
-# Allow backend
-!backend/**
-!.dockerignore
-!backend/requirements.txt
-!backend/Dockerfile
