@@ -25,9 +25,20 @@ MAX_PAGES = int(os.getenv("NUTRIPARSE_MAX_PAGES", "30"))
 CHUNK = 1 << 20
 
 
+# The project's own web app domains are always allowed, so a stale value in
+# the hosting dashboard cannot break production. ALLOWED_ORIGINS adds more.
+KNOWN_ORIGINS = [
+    "https://nutriparsereader.vercel.app",
+    "https://nutriparse-reader.vercel.app",
+    "http://localhost:3000",
+]
+# Vercel preview deployments of this project only (team scope in the host name).
+DEFAULT_ORIGIN_REGEX = r"^https://(?:food-pdf-extractor|nutriparse-reader)-[a-z0-9-]+-amilton-koxis-projects\.vercel\.app$"
+
+
 def _origins() -> list[str]:
-    raw = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000")
-    return [o.strip() for o in raw.split(",") if o.strip()]
+    extra = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "").split(",") if o.strip()]
+    return list(dict.fromkeys(KNOWN_ORIGINS + extra))
 
 
 app = FastAPI(
@@ -38,9 +49,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_origins(),
-    # Optional, for Vercel preview deployments of *this* project only, e.g.
-    # ^https://nutriparse-reader-[a-z0-9-]+-amiltonkoxi\.vercel\.app$
-    allow_origin_regex=os.getenv("ALLOWED_ORIGIN_REGEX") or None,
+    allow_origin_regex=os.getenv("ALLOWED_ORIGIN_REGEX") or DEFAULT_ORIGIN_REGEX,
     allow_credentials=False,  # the API uses no cookies
     allow_methods=["GET", "POST"],
     allow_headers=["*"],

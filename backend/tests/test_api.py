@@ -62,3 +62,13 @@ def test_cors_does_not_allow_credentials(client):
     r = client.options("/extract", headers={"Origin": "https://evil.vercel.app",
                                             "Access-Control-Request-Method": "POST"})
     assert "access-control-allow-origin" not in r.headers
+
+
+def test_cors_allows_production_and_project_previews(client):
+    for origin in ("https://nutriparsereader.vercel.app",
+                   "https://food-pdf-extractor-git-main-amilton-koxis-projects.vercel.app"):
+        r = client.options("/extract", headers={"Origin": origin, "Access-Control-Request-Method": "POST"})
+        assert r.headers.get("access-control-allow-origin") == origin
+    r = client.options("/extract", headers={"Origin": "https://food-pdf-extractor-x-someone-else.vercel.app",
+                                            "Access-Control-Request-Method": "POST"})
+    assert "access-control-allow-origin" not in r.headers
