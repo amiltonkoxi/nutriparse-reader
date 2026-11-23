@@ -1,188 +1,156 @@
-<h1 align="center">NutriParse Reader</h1>
+<h1 align="center">NutriParse</h1>
 
 <p align="center">
-  Developer Test Project · University of Debrecen · 2025
+  Evidence-first extraction of the 14 EU allergens and nutrition facts from food specification sheets (PDF, digital or scanned).
+</p>
+
+<p align="center">
+  <a href="https://github.com/amiltonkoxi/nutriparse-reader/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/amiltonkoxi/nutriparse-reader/actions/workflows/ci.yml/badge.svg"></a>
+  <img alt="Python 3.12" src="https://img.shields.io/badge/python-3.12-blue">
+  <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-green">
 </p>
 
 ---
 
-## Project Overview
+Quality teams at retailers and distributors receive hundreds of supplier
+specification sheets and check allergens by hand. NutriParse reads the PDF,
+returns the status of each of the 14 allergens of Regulation (EU)
+No 1169/2011 (Annex II), and **cites the text in the document behind every
+result**. When the document says nothing, it says `unknown` instead of
+guessing, so a person knows exactly what to check.
 
-NutriParse Reader is a full-stack web application that extracts allergen statements and nutrition facts from food product PDFs. It supports both digitally generated PDFs and scanned/image-based PDFs. The backend uses AI-augmented parsing (rule-based extraction with LLM assistance) to detect allergens and nutrition values, while the frontend presents the results in both table and JSON formats for quick review.
+<p align="center"><img src="image/result.png" width="720" alt="Result card: each allergen with its status and the evidence from the document"></p>
 
----
+## Results
 
-## Features
+Held-out synthetic test set (120 sheets in Hungarian, English and Polish,
+10 declaration formats, 212 PDFs including simulated scans). The baseline is
+the previous version of this project, run on the same extracted text.
 
-- Upload up to **two PDFs per run** using drag and drop or a file picker.
-- Process PDFs through AI/LLM-assisted logic to interpret ingredient statements and nutrition tables.
-- Extraction of the **10 required allergens**: Gluten, Egg, Crustaceans, Fish, Peanut, Soy, Milk, Tree nuts, Celery, Mustard.
-- Extract the six nutrition values: Energy, Fat, Carbohydrate, Sugar, Protein, Sodium.
-- Present structured output in a responsive table view and raw JSON view.
-- Automatic OCR fallback for scanned or photo-based PDFs.
+| | accuracy | **unsafe miss rate** | abstention |
+|---|---|---|---|
+| NutriParse v1 | **92.5%** | **0.0%** | 7.6% |
+| v0.3 baseline | 53.9% | 51.0% | 28.4% |
 
----
+*Unsafe miss rate*: share of allergens present in the product (contains or
+may contain) that were reported as absent. That is the error that can hurt
+a consumer, and the CI fails if it is not zero.
 
-## Tech Stack
+| input | accuracy | unsafe miss | abstention |
+|---|---|---|---|
+| digital PDF | 99.7% | 0.0% | 0.3% |
+| good scan | 90.2% | 0.0% | 9.4% |
+| poor scan | 76.2% | 0.0% | 24.8% |
 
-| Layer     | Technologies |
-|-----------|--------------|
-| Frontend  | Next.js (React), Tailwind CSS |
-| Backend   | FastAPI (Python) |
-| OCR       | Tesseract via `pytesseract` |
-| Parsing   | Custom allergen & nutrition parsers with LLM assistance |
+As scans get worse the system abstains more, but it does not start guessing
+"absent". Method, protocol, ablation and limitations:
+[docs/method.md](docs/method.md). Full reports:
+[evaluation/results](evaluation/results).
 
----
+## How it works
 
-## Installation and Usage
+```
+PDF ─► pages ─► words + boxes ─► evidence rules ─► fusion ─► status + evidence + page
+        │            ▲
+        │  scanned page? ── Tesseract OCR (hun + pol + eng)
+        └─► page image ─► visual cell readers (tick boxes, table flags)
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/amiltonkoxi/nutriparse-reader.git
-   cd nutriparse-reader
-   ```
+* **One document model for text and OCR.** Both produce words with bounding
+  boxes; only pages without a text layer are OCR'd.
+* **Evidence rules** for the formats seen on real sheets: ingredient lists,
+  "contains / may contain" statements, "no allergens" statements, I/N and
+  two-column tables, tick boxes, numbered +/- grids, and X marks placed under
+  column headings (read by geometry, not text).
+* **Visual cell readers** for what OCR drops in scanned tables: the ink inside
+  each tick box, and a single-line re-read of each row's flag cells.
+* **Safety-first fusion**: `unknown` by default, most severe status wins
+  among direct evidence, and contradictions are kept as `conflict` for review.
+* **Multilingual lexicon** (HU / EN / PL) that handles Hungarian case endings
+  and common traps such as cocoa butter, coconut milk and "kén-dioxid".
 
-2. **Install backend dependencies**
-   ```bash
-   cd backend
-   python3 -m venv .venv
-   source .venv/bin/activate        # Windows: .venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
+## Quick start
 
-3. **Start the backend**
-   ```bash
-   uvicorn app.main:app --reload
-   ```
+Requirements: Python 3.11+, Node 20+, Tesseract with `hun` and `pol` models,
+Poppler.
 
-4. **Install frontend dependencies**
-   ```bash
-   cd ../frontend
-   npm install
-   echo "NEXT_PUBLIC_API_BASE=http://127.0.0.1:8000" > .env.local
-   ```
+```bash
+# Debian/Ubuntu: sudo apt install tesseract-ocr tesseract-ocr-hun tesseract-ocr-pol poppler-utils
+# macOS:         brew install tesseract tesseract-lang poppler
+make install
+make dev          # API on :8000, web app on :3000
+```
 
-5. **Start the frontend**
-   ```bash
-   npm run dev
-   ```
+Or only the API, with Docker:
 
-6. **Open the app**
-   Visit `http://localhost:3000` in your browser, upload up to two PDFs, and inspect the extracted data.
+```bash
+docker build -t nutriparse-api backend
+docker run -p 8000:8000 -e ALLOWED_ORIGINS=http://localhost:3000 nutriparse-api
+```
 
----
+## API
+
+`POST /extract` with a multipart `file` (PDF, up to 15 MB and 30 pages).
+Interactive docs at `/docs`.
+
+```json
+{
+  "meta": {
+    "extraction_mode": "ocr", "pages": 1, "ocr_pages": [1],
+    "allergen_coverage": 1.0, "needs_review": false, "languages": ["en"]
+  },
+  "allergens": {
+    "gluten": {
+      "status": "contains",
+      "evidence": "…2. Ingredients wheat flour, water, yeast, salt…",
+      "basis": "ingredients", "page": 1, "conflict": false
+    },
+    "celery": {
+      "status": "traces",
+      "evidence": "…Allergens: gluten, sesame. May contain: celery…",
+      "basis": "statement", "page": 1, "conflict": false
+    }
+  },
+  "nutrition_per_100g": { "energy_kJ": 1234, "energy_kcal": 295, "fat_g": 8.5, "salt_g": 2.6 },
+  "diagnostics": { "warnings": ["Page 1 was read with OCR (scanned). Verify key values against the PDF."] }
+}
+```
+
+Errors: `413` file too large, `415` not a PDF, `422` unreadable or too many
+pages.
+
+## Reproduce the evaluation
+
+```bash
+make test                       # 47 unit and API tests
+make bench                      # synthetic test split (seed 2, 120 sheets, with scans)
+make bench-real REAL=/path/pdfs # private real-world set, matched by SHA-256
+```
+
+## Project layout
+
+```
+backend/nutriparse/   extraction, allergen rules, visual readers, fusion, API
+backend/tests/        unit tests per declaration format, API tests
+evaluation/           benchmark generator, evaluation script, v0.3 baseline, results
+docs/method.md        method, protocol, metrics, results, limitations
+frontend/             Next.js web app
+```
+
+## Limitations
+
+The synthetic benchmark and the engine were written by the same author, and
+the real-world set is small (10 food sheets) and was used for development.
+The numbers above are a strong signal, not a guarantee for unseen layouts.
+Only Hungarian, English and Polish are supported. See
+[docs/method.md](docs/method.md#6-limitations).
 
 ## Deployment
 
-NutriParse Reader runs with a split deployment: the backend is hosted on Render and the frontend on Vercel.
+* API: Docker on Render (`render.yaml`), `ALLOWED_ORIGINS` lists the web app's
+  origin. Credentials are not accepted cross-origin.
+* Web app: Vercel, with `NEXT_PUBLIC_API_BASE` pointing at the API.
 
-- **Backend:** https://nutriparse-reader-1.onrender.com  
-- **Frontend:** https://nutriparsereader.vercel.app
+## License
 
-Environment variables:
-
-- **Render:** `ALLOWED_ORIGINS=https://nutriparsereader.vercel.app,http://localhost:3000`
-- **Vercel:** `NEXT_PUBLIC_API_BASE=https://nutriparse-reader-1.onrender.com`
-
----
-
-## Screenshots
-
-| Preview | Description |
-|---------|-------------|
-| ![Homepage](image/Dark.png) | Homepage with upload panel and queue. |
-| ![File Drop](image/filedrop.png) | Drag and drop queue with two files selected. |
-| ![Extraction Result](image/result.png) | Extraction results with summary, JSON, and preview tabs. |
-
----
-
-## Demo Video
-
-Watch a short demonstration of NutriParse Reader in action (MP4 recommended for browser playback):
-[![Demo Video](image/result.png)](image/live-demo.mp4)
-*Tip: capture a representative frame from the video and save it as `image/result.png` or a dedicated thumbnail.*
-
-If the recording remains in MOV format, convert it before committing:
-```bash
-ffmpeg -i image/Live_test.MOV -vcodec libx264 -crf 23 -preset medium -acodec aac -movflags +faststart image/live-demo.mp4
-```
-Add the converted video so the link above stays valid:
-```bash
-git add image/live-demo.mp4
-```
-
-
----
-
-## Deliverables Mapping
-
-| Assignment Deliverable | Status |
-|------------------------|--------|
-| Source code            | ✔️ Completed |
-| Documentation          | ✔️ Completed |
-| Demonstration video    | ✔️ Completed |
-| Live deployment URL    | ✔️ Completed |
-
----
-
-## Testing and Contribution
-
-If pytest is installed inside the backend virtual environment, activate the venv and run:
-
-```bash
-cd backend
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pytest
-```
-
-### Contributing
-
-Fork the repository, create a feature branch, commit your changes, and open a pull request.
-
----
-
-## Architecture
-
-```
-User → Vercel Frontend (Next.js) → Render Backend (FastAPI)
-                   ↘               ↘
-                     OCR Engine (Tesseract) → Parser & LLM rules
-                                 ↘
-                           JSON response → Frontend display
-```
-
-- The Next.js frontend hosts the upload UI and result cards.
-- FastAPI on Render receives PDFs, orchestrates OCR and parsing, and returns normalized JSON.
-- Tesseract handles scanned/image PDFs; rule-based parsing plus LLM prompts extract allergens and nutrition.
-- Results are rendered in both table and JSON tabs for review/export.
-
----
-
-## Limitations & Future Work
-
-### Current limitations
-- Optimized for Hungarian and English PDFs; other languages may require new rules.
-- Allergen list is fixed to the 10 items defined in the assignment.
-- OCR-driven accuracy depends on source document quality (blurry scans reduce precision).
-
-### Planned improvements
-- Expand language coverage (Polish/German) with modular keyword packs.
-- Enrich nutrition parsing with serving-size conversion and micronutrients.
-- Provide a Docker Compose stack for streamlined local development and E2E testing.
-
----
-
-## Documentation
-
-- [Developer Guide](docs/Developer%20Guide.pdf)
-- [User Guide](docs/User%20Guide.pdf)
-
----
-
-## License & Acknowledgments
-
-- **License:** MIT License — see `LICENSE`.
-
----
-
-NutriParse Reader · 2025
+[MIT](LICENSE)

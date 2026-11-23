@@ -1,0 +1,119 @@
+{
+  "description": "Gold labels for the private real-world set: supplier specification sheets that cannot be published. Documents are identified by SHA-256 so anyone holding the same files can reproduce the numbers. Labels follow the label guide in docs/method.md. Annotated from the original PDFs (scanned pages checked visually).",
+  "allergens_order": "EU 1169/2011 Annex II",
+  "documents": [
+    {
+      "id": "R01",
+      "sha256": "c517af538b87f484685fd87c30f434c88ba35eeb81a539435d8d11321cffc63d",
+      "description": "Fresh pork loin, HU, digital",
+      "declaration_format": "global_statement",
+      "scanned": false,
+      "default": "absent",
+      "labels": {}
+    },
+    {
+      "id": "R02",
+      "sha256": "53ceb46616f4bcc6183e2a466f4fe67e250a697482744f3c614cb0b845e52f55",
+      "description": "Fresh chicken fillet, PL/EN, digital",
+      "declaration_format": "global_statement",
+      "scanned": false,
+      "default": "absent",
+      "labels": {}
+    },
+    {
+      "id": "R03",
+      "sha256": "7dc98b225402a3cd9fbb847eb99318229e41178ce40f907bbb827edd1875740e",
+      "description": "Breaded chicken wings, HU/EN, digital",
+      "declaration_format": "statement + grid",
+      "scanned": false,
+      "default": "absent",
+      "labels": {
+        "gluten": "contains",
+        "milk": "traces",
+        "celery": "traces",
+        "soy": "traces"
+      }
+    },
+    {
+      "id": "R04",
+      "sha256": "056e61bcf335dc8891ae65d809b1ccf7061da67bb32b1f97097ed02e63df3119",
+      "description": "Frozen hake fillet, HU, digital",
+      "declaration_format": "declaration (fish only)",
+      "scanned": false,
+      "default": "absent",
+      "labels": {
+        "fish": "contains"
+      }
+    },
+    {
+      "id": "R05",
+      "sha256": "ec51f92cf738cdca642f1f276520f1315f13a624a29aae4a0ca99f98b117a92a",
+      "description": "Smoked ham, HU, digital",
+      "declaration_format": "table I/N/X",
+      "scanned": false,
+      "default": "absent",
+      "labels": {}
+    },
+    {
+      "id": "R06",
+      "sha256": "53fa27756d50fa7e408cd3d0cad31128d004f526acdce3b216aec2684986722e",
+      "description": "Dry sausage, HU, scanned",
+      "declaration_format": "no allergen declaration",
+      "scanned": true,
+      "default": "unknown",
+      "labels": {}
+    },
+    {
+      "id": "R07",
+      "sha256": "2d248fa4f88120ec2aa5ac803738bff7ee654b66c937fcb98fbe84d85545a803",
+      "description": "Crushed paprika paste, HU/EN, scanned",
+      "declaration_format": "table Y/N",
+      "scanned": true,
+      "default": "absent",
+      "labels": {}
+    },
+    {
+      "id": "R08",
+      "sha256": "696c1e7adc53750818adebd1c5899ec43f180d58feb96c850bfee413ba369842",
+      "description": "Egg pasta, HU, scanned",
+      "declaration_format": "statement + X-mark table",
+      "scanned": true,
+      "default": "absent",
+      "labels": {
+        "gluten": "contains",
+        "egg": "contains"
+      }
+    },
+    {
+      "id": "R09",
+      "sha256": "b267ddc797778019e1162014a1c7615cb8dcb3f6499d31c55f871616679475b4",
+      "description": "Processed cheese with ham, HU, digital",
+      "declaration_format": "statement + 2-column table",
+      "scanned": false,
+      "default": "absent",
+      "labels": {
+        "milk": "contains"
+      }
+    },
+    {
+      "id": "R10",
+      "sha256": "edccfc3f447c9dda44efadf1a1f6c1b09b30d93e83f9ec51b17bd4477e720df7",
+      "description": "Natural yoghurt, HU, scanned",
+      "declaration_format": "tick-box table",
+      "scanned": true,
+      "default": "absent",
+      "labels": {
+        "milk": "contains"
+      }
+    },
+    {
+      "id": "R11",
+      "sha256": "a2afe73b8a6ec90a5b61456738094276c54f2175c9a5dac31c48ca1f88ff7f5e",
+      "description": "Grill cleaner (non-food), HU, digital",
+      "declaration_format": "non-food",
+      "scanned": false,
+      "default": "not_applicable",
+      "labels": {}
+    }
+  ]
+}

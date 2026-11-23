@@ -1,40 +1,59 @@
-# === NutriParse Reader — Developer shortcuts ===
-API ?= http://127.0.0.1:8000
-IN  ?= samples
-OUT ?= out
-GOLDEN ?= golden
+# NutriParse developer commands. Run `make help`.
+PY      ?= python3
+VENV    ?= backend/.venv
+BIN      = $(VENV)/bin
+N       ?= 120
+SEED    ?= 2
+REAL    ?=
 
-.PHONY: help batch golden-check previews golden-freeze test clean
+.PHONY: help install dev api web test lint bench bench-digital bench-real docker clean
 
 help:
-	@echo "Usage:"
-	@echo "  make batch           # Run extraction on all PDFs -> out/*.json + out/summary.csv"
-	@echo "  make golden-check    # Compare API outputs with golden/*.json (regression test)"
-	@echo "  make previews        # Save diagnostics.raw_text_preview -> out/*.txt"
-	@echo "  make golden-freeze   # Copy current out/*.json into golden/ (freeze baseline)"
-	@echo "  make test            # batch + golden-check"
-	@echo "  make clean           # Remove out/ and temp files"
-	@echo ""
-	@echo "Vars (override like: make batch API=http://localhost:8000 IN=samples2):"
-	@echo "  API=$(API)  IN=$(IN)  OUT=$(OUT)  GOLDEN=$(GOLDEN)"
+	@echo "make install        create backend/.venv and install backend + frontend deps"
+	@echo "make dev            run API (:8000) and web app (:3000)"
+	@echo "make test           unit and API tests"
+	@echo "make lint           ruff"
+	@echo "make bench          synthetic benchmark (digital + scanned), N=$(N) SEED=$(SEED)"
+	@echo "make bench-digital  fast benchmark, digital PDFs only (used in CI)"
+	@echo "make bench-real REAL=/path/to/pdfs   private real-world set"
+	@echo "make docker         build the API image"
 
-batch:
-	python tools/batch_extract.py $(IN) $(OUT) $(API)
+install:
+	$(PY) -m venv $(VENV)
+	$(BIN)/pip install -r backend/requirements-dev.txt
+	cd frontend && npm ci
 
-golden-check:
-	python tools/golden_check.py $(IN) $(GOLDEN) $(API)
+api:
+	cd backend && ../$(BIN)/uvicorn nutriparse.api:app --reload --port 8000
 
-previews:
-	python tools/save_previews.py $(IN) $(OUT) $(API)
+web:
+	cd frontend && NEXT_PUBLIC_API_BASE=http://127.0.0.1:8000 npm run dev
 
-golden-freeze:
-	@mkdir -p $(GOLDEN)
-	@cp $(OUT)/*.json $(GOLDEN)/ 2>/dev/null || true
-	@echo "Golden updated from $(OUT)/ -> $(GOLDEN)/"
+dev:
+	$(MAKE) -j2 api web
 
-test: batch golden-check
+test:
+	cd backend && ../$(BIN)/pytest -q
+
+lint:
+	cd backend && ../$(BIN)/ruff check nutriparse tests ../evaluation
+
+data/synth_seed$(SEED)/labels.jsonl:
+	$(BIN)/python evaluation/synth/generate.py --out data/synth_seed$(SEED) --n $(N) --seed $(SEED) --scan-share 0.4
+
+bench: data/synth_seed$(SEED)/labels.jsonl
+	$(BIN)/python evaluation/evaluate.py synth --data data/synth_seed$(SEED) --out evaluation/results/synth_seed$(SEED)
+
+bench-digital: data/synth_seed$(SEED)/labels.jsonl
+	$(BIN)/python evaluation/evaluate.py synth --data data/synth_seed$(SEED) --variants digital \
+		--out evaluation/results/synth_seed$(SEED)_digital
+
+bench-real:
+	@test -n "$(REAL)" || (echo "usage: make bench-real REAL=/path/to/pdfs" && exit 1)
+	$(BIN)/python evaluation/evaluate.py real --data $(REAL) --out evaluation/results/real
+
+docker:
+	docker build -t nutriparse-api backend
 
 clean:
-	rm -rf $(OUT)
-	mkdir -p $(OUT)
-	@echo "Cleaned $(OUT)/"
+	rm -rf data/synth_seed* backend/.pytest_cache backend/.ruff_cache

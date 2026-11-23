@@ -24,7 +24,7 @@ const DEFAULT_MAX = parseInt(process.env.NEXT_PUBLIC_MAX_FILES ?? "2", 10);
 // Types (aligned with backend)
 // ----------------------------------------------------------------------------
 export type UploadResult = {
-  meta: { source_file: string; extraction_mode: "text" | "ocr"; confidence: number };
+  meta: { source_file: string | null; extraction_mode: "text" | "ocr" | "mixed"; allergen_coverage: number };
   allergens: Record<string, { status: "contains" | "traces" | "absent" | "unknown"; evidence: string | null }>;
   nutrition_per_100g: {
     energy_kJ: number | string | null;
@@ -275,7 +275,7 @@ export default function HomePage() {
           {error && <p className="mt-4 text-center text-sm font-medium text-rose-400">{error}</p>}
           <div className="mt-6 space-y-2 text-center text-sm text-slate-300">
             <p className="font-semibold text-slate-300">
-              Extracts 10 allergens · 6 nutrition facts · OCR fallback for scanned PDFs
+              14 EU allergens with evidence · nutrition per 100 g · OCR for scanned pages
             </p>
             <p className="text-slate-400">
               Works with unstructured tables or lists. Review results in an interactive table or copy the full JSON output.
@@ -350,7 +350,7 @@ export default function HomePage() {
             <div className="text-center">
               <h2 className="text-xl font-semibold text-slate-100">Review structured results</h2>
               <p className="mt-1 text-sm text-slate-300">
-                Each card includes confidence scores, allergen flags, nutrition per 100 g, and a JSON copy option.
+                Each card shows every allergen with the text that supports it, what still needs a manual check, nutrition per 100 g, and the raw JSON.
               </p>
             </div>
             {results

@@ -6,27 +6,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { ScrollArea } from "./ui/scroll-area";
 import { ClipboardCopy, Check } from "lucide-react";
 
-type AllergenStatus = "contains" | "traces" | "absent" | "unknown";
+import type { AllergenEntry, AllergenStatus, ApiResponse, NutrientValue } from "@/lib/types";
 
-type NutrientValue = number | string | null;
-
-type ApiLike = {
-  meta?: { source_file?: string; extraction_mode?: "text" | "ocr"; confidence?: number | null };
-  allergens?: Record<string, { status: AllergenStatus; evidence: string | null }>;
-  nutrition_per_100g?: {
-    energy_kJ?: NutrientValue;
-    energy_kcal?: NutrientValue;
-    fat_g?: NutrientValue;
-    saturated_fat_g?: NutrientValue;
-    carbohydrate_g?: NutrientValue;
-    sugars_g?: NutrientValue;
-    protein_g?: NutrientValue;
-    salt_g?: NutrientValue;
-    sodium_mg?: NutrientValue;
-    collagen_g?: NutrientValue;
-    water_g?: NutrientValue;
-  };
-  diagnostics?: { warnings?: string[]; raw_text_preview?: string; nutrition_evidence?: Record<string, string | null>; notes?: string[] | null };
+type ApiLike = Partial<ApiResponse> & {
+  allergens?: Record<string, AllergenEntry>;
 };
 
 const cx = (...c: Array<string | false | undefined>) => c.filter(Boolean).join(" ");
@@ -36,6 +19,25 @@ const STATUS_STYLES: Record<AllergenStatus, string> = {
   traces: "bg-amber-500 text-white",
   absent: "bg-emerald-600 text-white",
   unknown: "bg-slate-500 text-white",
+};
+
+const STATUS_LABEL: Record<AllergenStatus, string> = {
+  contains: "CONTAINS",
+  traces: "MAY CONTAIN",
+  absent: "ABSENT",
+  unknown: "NO EVIDENCE",
+};
+
+const BASIS_LABEL: Record<string, string> = {
+  ingredients: "ingredient list",
+  statement: "allergen statement",
+  table_flags: "allergen table",
+  checkbox: "tick box",
+  grid: "+/- grid",
+  layout_table: "table column",
+  global_statement: "\"no allergens\" statement",
+  implicit_declaration: "not in the declared list",
+  not_food: "non-food document",
 };
 
 const TILE_COLORS: Record<string, string> = {
@@ -157,8 +159,12 @@ export default function ResultCard({ data }: { data?: ApiLike | null }) {
     tiles.push({ label: "Collagen", value: fmtG(nutrition.collagen_g) });
   }
 
-  const confidencePct = Math.round((meta.confidence ?? 0) * 100);
-  const modeLabel = meta.extraction_mode === "ocr" ? "OCR mode" : "Text mode";
+  const coverage = meta.allergen_coverage ?? 0;
+  const coveragePct = Math.round(coverage * 100);
+  const evidenced = Math.round(coverage * 14);
+  const modeLabel =
+    meta.extraction_mode === "ocr" ? "Scanned (OCR)" : meta.extraction_mode === "mixed" ? "Mixed (text + OCR)" : "Digital text";
+  const warnings = data.diagnostics?.warnings ?? [];
 
   return (
     <Card className="rounded-2xl border border-slate-700 bg-slate-900/80 shadow-sm transition hover:shadow-md">
@@ -175,9 +181,20 @@ export default function ResultCard({ data }: { data?: ApiLike | null }) {
               <span className="inline-block rounded border border-slate-600 bg-slate-800 px-2 py-0.5 text-slate-200">
                 {modeLabel}
               </span>
-              <span className="inline-block rounded border border-violet-500 bg-violet-700 px-2 py-0.5 text-white">
-                Confidence: {confidencePct}%
+              <span className="inline-block rounded border border-violet-500 bg-violet-700 px-2 py-0.5 text-white"
+                title="Allergens whose status is backed by text in the document">
+                Evidence: {evidenced}/14 allergens
               </span>
+              {meta.pages ? (
+                <span className="inline-block rounded border border-slate-600 bg-slate-800 px-2 py-0.5 text-slate-200">
+                  {meta.pages} {meta.pages === 1 ? "page" : "pages"}
+                </span>
+              ) : null}
+              {meta.needs_review && (
+                <span className="inline-block rounded border border-amber-400 bg-amber-500 px-2 py-0.5 font-semibold text-slate-900">
+                  Needs review
+                </span>
+              )}
             </div>
           </div>
 
@@ -191,10 +208,10 @@ export default function ResultCard({ data }: { data?: ApiLike | null }) {
           <div
             className={cx(
               "h-2 rounded bg-emerald-500 transition-all",
-              confidencePct >= 80 && "bg-emerald-600",
-              confidencePct < 50 && "bg-amber-500"
+              coveragePct >= 99 && "bg-emerald-600",
+              coveragePct < 50 && "bg-amber-500"
             )}
-            style={{ width: `${Math.max(0, Math.min(100, confidencePct))}%` }}
+            style={{ width: `${Math.max(0, Math.min(100, coveragePct))}%` }}
           />
         </div>
       </CardHeader>
@@ -246,27 +263,62 @@ export default function ResultCard({ data }: { data?: ApiLike | null }) {
                 Allergens
               </h3>
               {Object.keys(allergens).length ? (
-                <div className="flex flex-wrap gap-2">
-                  {Object.entries(allergens).map(([k, v]) => (
-                    <span
-                      key={k}
-                      className={cx(
-                        "inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold shadow-sm",
-                        STATUS_STYLES[(v?.status ?? "unknown") as AllergenStatus]
-                      )}
-                    >
-                      {k.replace(/_/g, " ")}
-                      <span className="rounded bg-black/10 px-1.5 py-0.5 text-[10px]">
-                        {String((v?.status ?? "unknown")).toUpperCase()}
-                      </span>
-                    </span>
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-md border border-slate-600 bg-slate-800 px-3 py-2 text-xs text-slate-200">
-                No allergen entries found in this document.
-              </div>
-            )}
+                <div className="overflow-hidden rounded-xl border border-slate-700">
+                  <table className="w-full text-left text-xs text-slate-200">
+                    <thead className="bg-slate-800 text-[11px] uppercase tracking-wide text-slate-400">
+                      <tr>
+                        <th className="px-3 py-2">Allergen</th>
+                        <th className="px-3 py-2">Status</th>
+                        <th className="hidden px-3 py-2 sm:table-cell">Evidence from the document</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(allergens).map(([k, v]) => {
+                        const st = (v?.status ?? "unknown") as AllergenStatus;
+                        return (
+                          <tr key={k} className="border-t border-slate-800 align-top">
+                            <td className="px-3 py-2 font-medium capitalize">{k.replace(/_/g, " ")}</td>
+                            <td className="px-3 py-2">
+                              <span className={cx("inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold", STATUS_STYLES[st])}>
+                                {STATUS_LABEL[st]}
+                              </span>
+                              {v?.conflict && (
+                                <span className="ml-1 inline-block rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-slate-900"
+                                  title="The document contradicts itself; the safer status was kept">
+                                  CONFLICT
+                                </span>
+                              )}
+                            </td>
+                            <td className="hidden px-3 py-2 text-slate-300 sm:table-cell">
+                              {v?.evidence ? (
+                                <>
+                                  <span className="italic">&ldquo;{v.evidence}&rdquo;</span>
+                                  <span className="ml-1 text-slate-500">
+                                    ({BASIS_LABEL[v.basis ?? ""] ?? v.basis}{v.page ? `, p. ${v.page}` : ""})
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-slate-500">Not mentioned. Check manually.</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="rounded-md border border-slate-600 bg-slate-800 px-3 py-2 text-xs text-slate-200">
+                  No allergen entries found in this document.
+                </div>
+              )}
+              {warnings.length > 0 && (
+                <ul className="mt-3 space-y-1 rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-100">
+                  {warnings.map((w, i) => (
+                    <li key={i}>{w}</li>
+                  ))}
+                </ul>
+              )}
           </section>
 
           <section className="space-y-4">

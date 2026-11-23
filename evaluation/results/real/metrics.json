@@ -1,0 +1,1102 @@
+{
+  "documents": 10,
+  "systems": {
+    "v1": {
+      "all": {
+        "n": 140,
+        "accuracy": 1.0,
+        "unsafe_miss_rate": 0.0,
+        "false_absent_rate": 0.0,
+        "positive_recall": 1.0,
+        "abstention_rate": 0.0,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "contains": {
+            "contains": 6,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 3,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 117,
+            "unknown": 0
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 14
+          }
+        },
+        "ci95_unsafe_miss_rate": [
+          0.0,
+          0.0
+        ],
+        "ci95_accuracy": [
+          1.0,
+          1.0
+        ]
+      },
+      "variant=digital": {
+        "n": 84,
+        "accuracy": 1.0,
+        "unsafe_miss_rate": 0.0,
+        "false_absent_rate": 0.0,
+        "positive_recall": 1.0,
+        "abstention_rate": 0.0,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "contains": {
+            "contains": 3,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 3,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 78,
+            "unknown": 0
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        },
+        "ci95_unsafe_miss_rate": [
+          0.0,
+          0.0
+        ],
+        "ci95_accuracy": [
+          1.0,
+          1.0
+        ]
+      },
+      "variant=scanned": {
+        "n": 56,
+        "accuracy": 1.0,
+        "unsafe_miss_rate": 0.0,
+        "false_absent_rate": 0.0,
+        "positive_recall": 1.0,
+        "abstention_rate": 0.0,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "contains": {
+            "contains": 3,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 39,
+            "unknown": 0
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 14
+          }
+        },
+        "ci95_unsafe_miss_rate": [
+          0.0,
+          0.0
+        ],
+        "ci95_accuracy": [
+          1.0,
+          1.0
+        ]
+      },
+      "format=global_statement": {
+        "n": 28,
+        "accuracy": 1.0,
+        "unsafe_miss_rate": null,
+        "false_absent_rate": null,
+        "positive_recall": null,
+        "abstention_rate": 0.0,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "contains": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 28,
+            "unknown": 0
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "format=statement + grid": {
+        "n": 14,
+        "accuracy": 1.0,
+        "unsafe_miss_rate": 0.0,
+        "false_absent_rate": 0.0,
+        "positive_recall": 1.0,
+        "abstention_rate": 0.0,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "contains": {
+            "contains": 1,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 3,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 10,
+            "unknown": 0
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "format=declaration (fish only)": {
+        "n": 14,
+        "accuracy": 1.0,
+        "unsafe_miss_rate": 0.0,
+        "false_absent_rate": 0.0,
+        "positive_recall": 1.0,
+        "abstention_rate": 0.0,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "contains": {
+            "contains": 1,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 13,
+            "unknown": 0
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "format=table I/N/X": {
+        "n": 14,
+        "accuracy": 1.0,
+        "unsafe_miss_rate": null,
+        "false_absent_rate": null,
+        "positive_recall": null,
+        "abstention_rate": 0.0,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "contains": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 14,
+            "unknown": 0
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "format=no allergen declaration": {
+        "n": 14,
+        "accuracy": 1.0,
+        "unsafe_miss_rate": null,
+        "false_absent_rate": 0.0,
+        "positive_recall": null,
+        "abstention_rate": null,
+        "selective_accuracy": null,
+        "confusion": {
+          "contains": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 14
+          }
+        }
+      },
+      "format=table Y/N": {
+        "n": 14,
+        "accuracy": 1.0,
+        "unsafe_miss_rate": null,
+        "false_absent_rate": null,
+        "positive_recall": null,
+        "abstention_rate": 0.0,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "contains": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 14,
+            "unknown": 0
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "format=statement + X-mark table": {
+        "n": 14,
+        "accuracy": 1.0,
+        "unsafe_miss_rate": 0.0,
+        "false_absent_rate": 0.0,
+        "positive_recall": 1.0,
+        "abstention_rate": 0.0,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "contains": {
+            "contains": 2,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 12,
+            "unknown": 0
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "format=statement + 2-column table": {
+        "n": 14,
+        "accuracy": 1.0,
+        "unsafe_miss_rate": 0.0,
+        "false_absent_rate": 0.0,
+        "positive_recall": 1.0,
+        "abstention_rate": 0.0,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "contains": {
+            "contains": 1,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 13,
+            "unknown": 0
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "format=tick-box table": {
+        "n": 14,
+        "accuracy": 1.0,
+        "unsafe_miss_rate": 0.0,
+        "false_absent_rate": 0.0,
+        "positive_recall": 1.0,
+        "abstention_rate": 0.0,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "contains": {
+            "contains": 1,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 13,
+            "unknown": 0
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "per_allergen": {
+        "gluten": {
+          "n": 10,
+          "accuracy": 1.0,
+          "unsafe_miss_rate": 0.0,
+          "positive_recall": 1.0,
+          "abstention_rate": 0.0
+        },
+        "crustaceans": {
+          "n": 10,
+          "accuracy": 1.0,
+          "unsafe_miss_rate": null,
+          "positive_recall": null,
+          "abstention_rate": 0.0
+        },
+        "egg": {
+          "n": 10,
+          "accuracy": 1.0,
+          "unsafe_miss_rate": 0.0,
+          "positive_recall": 1.0,
+          "abstention_rate": 0.0
+        },
+        "fish": {
+          "n": 10,
+          "accuracy": 1.0,
+          "unsafe_miss_rate": 0.0,
+          "positive_recall": 1.0,
+          "abstention_rate": 0.0
+        },
+        "peanut": {
+          "n": 10,
+          "accuracy": 1.0,
+          "unsafe_miss_rate": null,
+          "positive_recall": null,
+          "abstention_rate": 0.0
+        },
+        "soy": {
+          "n": 10,
+          "accuracy": 1.0,
+          "unsafe_miss_rate": 0.0,
+          "positive_recall": 1.0,
+          "abstention_rate": 0.0
+        },
+        "milk": {
+          "n": 10,
+          "accuracy": 1.0,
+          "unsafe_miss_rate": 0.0,
+          "positive_recall": 1.0,
+          "abstention_rate": 0.0
+        },
+        "tree_nuts": {
+          "n": 10,
+          "accuracy": 1.0,
+          "unsafe_miss_rate": null,
+          "positive_recall": null,
+          "abstention_rate": 0.0
+        },
+        "celery": {
+          "n": 10,
+          "accuracy": 1.0,
+          "unsafe_miss_rate": 0.0,
+          "positive_recall": 1.0,
+          "abstention_rate": 0.0
+        },
+        "mustard": {
+          "n": 10,
+          "accuracy": 1.0,
+          "unsafe_miss_rate": null,
+          "positive_recall": null,
+          "abstention_rate": 0.0
+        },
+        "sesame": {
+          "n": 10,
+          "accuracy": 1.0,
+          "unsafe_miss_rate": null,
+          "positive_recall": null,
+          "abstention_rate": 0.0
+        },
+        "sulphites": {
+          "n": 10,
+          "accuracy": 1.0,
+          "unsafe_miss_rate": null,
+          "positive_recall": null,
+          "abstention_rate": 0.0
+        },
+        "lupin": {
+          "n": 10,
+          "accuracy": 1.0,
+          "unsafe_miss_rate": null,
+          "positive_recall": null,
+          "abstention_rate": 0.0
+        },
+        "molluscs": {
+          "n": 10,
+          "accuracy": 1.0,
+          "unsafe_miss_rate": null,
+          "positive_recall": null,
+          "abstention_rate": 0.0
+        }
+      }
+    },
+    "legacy": {
+      "all": {
+        "n": 140,
+        "accuracy": 0.6286,
+        "unsafe_miss_rate": 0.4444,
+        "false_absent_rate": 0.6087,
+        "positive_recall": 0.5556,
+        "abstention_rate": 0.2857,
+        "selective_accuracy": 0.84,
+        "confusion": {
+          "contains": {
+            "contains": 2,
+            "traces": 0,
+            "absent": 4,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 2,
+            "traces": 1,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 81,
+            "unknown": 36
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 10,
+            "unknown": 4
+          }
+        },
+        "ci95_unsafe_miss_rate": [
+          0.0,
+          1.0
+        ],
+        "ci95_accuracy": [
+          0.5357,
+          0.6929
+        ]
+      },
+      "variant=digital": {
+        "n": 84,
+        "accuracy": 0.6786,
+        "unsafe_miss_rate": 0.1667,
+        "false_absent_rate": 0.1667,
+        "positive_recall": 0.8333,
+        "abstention_rate": 0.2857,
+        "selective_accuracy": 0.95,
+        "confusion": {
+          "contains": {
+            "contains": 2,
+            "traces": 0,
+            "absent": 1,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 2,
+            "traces": 1,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 54,
+            "unknown": 24
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        },
+        "ci95_unsafe_miss_rate": [
+          0.0,
+          1.0
+        ],
+        "ci95_accuracy": [
+          0.631,
+          0.7143
+        ]
+      },
+      "variant=scanned": {
+        "n": 56,
+        "accuracy": 0.5536,
+        "unsafe_miss_rate": 1.0,
+        "false_absent_rate": 0.7647,
+        "positive_recall": 0.0,
+        "abstention_rate": 0.2857,
+        "selective_accuracy": 0.675,
+        "confusion": {
+          "contains": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 3,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 27,
+            "unknown": 12
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 10,
+            "unknown": 4
+          }
+        },
+        "ci95_unsafe_miss_rate": [
+          1.0,
+          1.0
+        ],
+        "ci95_accuracy": [
+          0.375,
+          0.6786
+        ]
+      },
+      "format=global_statement": {
+        "n": 28,
+        "accuracy": 0.7143,
+        "unsafe_miss_rate": null,
+        "false_absent_rate": null,
+        "positive_recall": null,
+        "abstention_rate": 0.2857,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "contains": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 20,
+            "unknown": 8
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "format=statement + grid": {
+        "n": 14,
+        "accuracy": 0.5714,
+        "unsafe_miss_rate": 0.0,
+        "false_absent_rate": 0.0,
+        "positive_recall": 1.0,
+        "abstention_rate": 0.2857,
+        "selective_accuracy": 0.8,
+        "confusion": {
+          "contains": {
+            "contains": 1,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 2,
+            "traces": 1,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 6,
+            "unknown": 4
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "format=declaration (fish only)": {
+        "n": 14,
+        "accuracy": 0.7143,
+        "unsafe_miss_rate": 0.0,
+        "false_absent_rate": 0.0,
+        "positive_recall": 1.0,
+        "abstention_rate": 0.2857,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "contains": {
+            "contains": 1,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 9,
+            "unknown": 4
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "format=table I/N/X": {
+        "n": 14,
+        "accuracy": 0.7143,
+        "unsafe_miss_rate": null,
+        "false_absent_rate": null,
+        "positive_recall": null,
+        "abstention_rate": 0.2857,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "contains": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 10,
+            "unknown": 4
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "format=no allergen declaration": {
+        "n": 14,
+        "accuracy": 0.2857,
+        "unsafe_miss_rate": null,
+        "false_absent_rate": 0.7143,
+        "positive_recall": null,
+        "abstention_rate": null,
+        "selective_accuracy": 0.0,
+        "confusion": {
+          "contains": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 10,
+            "unknown": 4
+          }
+        }
+      },
+      "format=table Y/N": {
+        "n": 14,
+        "accuracy": 0.7143,
+        "unsafe_miss_rate": null,
+        "false_absent_rate": null,
+        "positive_recall": null,
+        "abstention_rate": 0.2857,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "contains": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 10,
+            "unknown": 4
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "format=statement + X-mark table": {
+        "n": 14,
+        "accuracy": 0.5714,
+        "unsafe_miss_rate": 1.0,
+        "false_absent_rate": 1.0,
+        "positive_recall": 0.0,
+        "abstention_rate": 0.2857,
+        "selective_accuracy": 0.8,
+        "confusion": {
+          "contains": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 2,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 8,
+            "unknown": 4
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "format=statement + 2-column table": {
+        "n": 14,
+        "accuracy": 0.6429,
+        "unsafe_miss_rate": 1.0,
+        "false_absent_rate": 1.0,
+        "positive_recall": 0.0,
+        "abstention_rate": 0.2857,
+        "selective_accuracy": 0.9,
+        "confusion": {
+          "contains": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 1,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 9,
+            "unknown": 4
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "format=tick-box table": {
+        "n": 14,
+        "accuracy": 0.6429,
+        "unsafe_miss_rate": 1.0,
+        "false_absent_rate": 1.0,
+        "positive_recall": 0.0,
+        "abstention_rate": 0.2857,
+        "selective_accuracy": 0.9,
+        "confusion": {
+          "contains": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 1,
+            "unknown": 0
+          },
+          "traces": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          },
+          "absent": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 9,
+            "unknown": 4
+          },
+          "unknown": {
+            "contains": 0,
+            "traces": 0,
+            "absent": 0,
+            "unknown": 0
+          }
+        }
+      },
+      "per_allergen": {
+        "gluten": {
+          "n": 10,
+          "accuracy": 0.8,
+          "unsafe_miss_rate": 0.5,
+          "positive_recall": 0.5,
+          "abstention_rate": 0.0
+        },
+        "crustaceans": {
+          "n": 10,
+          "accuracy": 0.9,
+          "unsafe_miss_rate": null,
+          "positive_recall": null,
+          "abstention_rate": 0.0
+        },
+        "egg": {
+          "n": 10,
+          "accuracy": 0.8,
+          "unsafe_miss_rate": 1.0,
+          "positive_recall": 0.0,
+          "abstention_rate": 0.0
+        },
+        "fish": {
+          "n": 10,
+          "accuracy": 0.9,
+          "unsafe_miss_rate": 0.0,
+          "positive_recall": 1.0,
+          "abstention_rate": 0.0
+        },
+        "peanut": {
+          "n": 10,
+          "accuracy": 0.9,
+          "unsafe_miss_rate": null,
+          "positive_recall": null,
+          "abstention_rate": 0.0
+        },
+        "soy": {
+          "n": 10,
+          "accuracy": 0.8,
+          "unsafe_miss_rate": 0.0,
+          "positive_recall": 1.0,
+          "abstention_rate": 0.0
+        },
+        "milk": {
+          "n": 10,
+          "accuracy": 0.6,
+          "unsafe_miss_rate": 0.6667,
+          "positive_recall": 0.3333,
+          "abstention_rate": 0.0
+        },
+        "tree_nuts": {
+          "n": 10,
+          "accuracy": 0.9,
+          "unsafe_miss_rate": null,
+          "positive_recall": null,
+          "abstention_rate": 0.0
+        },
+        "celery": {
+          "n": 10,
+          "accuracy": 0.9,
+          "unsafe_miss_rate": 0.0,
+          "positive_recall": 1.0,
+          "abstention_rate": 0.0
+        },
+        "mustard": {
+          "n": 10,
+          "accuracy": 0.9,
+          "unsafe_miss_rate": null,
+          "positive_recall": null,
+          "abstention_rate": 0.0
+        },
+        "sesame": {
+          "n": 10,
+          "accuracy": 0.1,
+          "unsafe_miss_rate": null,
+          "positive_recall": null,
+          "abstention_rate": 1.0
+        },
+        "sulphites": {
+          "n": 10,
+          "accuracy": 0.1,
+          "unsafe_miss_rate": null,
+          "positive_recall": null,
+          "abstention_rate": 1.0
+        },
+        "lupin": {
+          "n": 10,
+          "accuracy": 0.1,
+          "unsafe_miss_rate": null,
+          "positive_recall": null,
+          "abstention_rate": 1.0
+        },
+        "molluscs": {
+          "n": 10,
+          "accuracy": 0.1,
+          "unsafe_miss_rate": null,
+          "positive_recall": null,
+          "abstention_rate": 1.0
+        }
+      }
+    }
+  },
+  "latency_seconds": {
+    "text": 0.66,
+    "ocr": 16.48,
+    "all_median": 1.06
+  }
+}

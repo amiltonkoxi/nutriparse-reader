@@ -11,7 +11,7 @@ export default function HowItWorks() {
     {
       n: 2,
       t: "Extract",
-      d: "Checks 10 allergens and nutrients per 100 g",
+      d: "Reads the 14 EU allergens and nutrition per 100 g, citing the text behind each result.",
     },
     {
       n: 3,
